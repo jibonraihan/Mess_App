@@ -329,8 +329,6 @@ abstract class _$$LoadedImplCopyWith<$Res> {
   ) = __$$LoadedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({Mess mess});
-
-  $MessCopyWith<$Res> get mess;
 }
 
 /// @nodoc
@@ -355,16 +353,6 @@ class __$$LoadedImplCopyWithImpl<$Res>
                   as Mess,
       ),
     );
-  }
-
-  /// Create a copy of MessState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $MessCopyWith<$Res> get mess {
-    return $MessCopyWith<$Res>(_value.mess, (value) {
-      return _then(_value.copyWith(mess: value));
-    });
   }
 }
 

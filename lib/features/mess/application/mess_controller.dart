@@ -14,7 +14,8 @@ final messRepositoryProvider = Provider<MessRepository>((ref) {
 // StateNotifierProvider for managing the current mess and user's mess data
 final messControllerProvider =
     StateNotifierProvider<MessController, MessState>((ref) {
-  final repository = InMemoryMessRepository();
+
+  final repository = ref.watch(messRepositoryProvider);
 
   return MessController(ref, repository);
 });
@@ -97,6 +98,28 @@ Future<void> createMess(String messName) async {
       state = MessState.error(message: 'Failed to leave mess: ${e.toString()}');
     }
   }
+  // UPDATE MESS PROFILE
+void updateMessProfile({
+  required String name,
+  String? description,
+  String? avatarUrl,
+}) {
+  final currentState = state;
+
+  currentState.whenOrNull(
+    loaded: (mess) {
+      final updatedMess = mess.copyWith(
+        name: name,
+        description: description,
+        avatarUrl: avatarUrl,
+      );
+
+      state = MessState.loaded(
+        mess: updatedMess,
+      );
+    },
+  );
+}
 
   // Generate a unique invite code (simple mock implementation)
   String _generateInviteCode() {

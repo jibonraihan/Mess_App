@@ -1,36 +1,381 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../application/home_dashboard_providers.dart';
-import '../../domain/home_dashboard.dart';
-import '../../../../core/responsive/responsive_breakpoints.dart';
-import '../widgets/animated_chart_placeholder.dart';
-import '../widgets/dashboard_card.dart';
-import '../widgets/quick_action_button.dart';
-import '../widgets/recent_activity_list.dart';
-import '../widgets/statistics_card.dart';
-import 'package:mess_app/core/widgets/member_avatar_row.dart';
+import '../../../mess/application/mess_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDesktop = ResponsiveBreakpoints.isDesktop(context);
-    final dashboard = ref.watch(homeDashboardProvider);
+    final messState = ref.watch(messControllerProvider);
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: dashboard.when(
-        data: (snapshot) => _DashboardContent(
-          snapshot: snapshot,
-          isDesktop: isDesktop,
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => Center(
-          child: FilledButton.tonal(
-            onPressed: () => ref.invalidate(homeDashboardProvider),
-            child: const Text('Retry dashboard'),
+    final mess = messState.maybeWhen(
+      loaded: (mess) => mess,
+      orElse: () => null,
+    );
+
+    final messName = mess?.name ?? 'My Community';
+
+    final messDescription =
+        mess?.description?.trim().isNotEmpty == true
+            ? mess!.description!
+            : 'No description yet';
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0B0B16),
+
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // TOP SECTION
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // LEFT
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          messName,
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Text(
+                          'Welcome back, Admin 👋',
+                          style: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 18,
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        Wrap(
+                          spacing: 20,
+                          runSpacing: 20,
+                          children: const [
+                            _StatCard(
+                              title: 'Members',
+                              value: '12',
+                              icon: Icons.group,
+                            ),
+
+                            _StatCard(
+                              title: 'Today Meals',
+                              value: '26',
+                              icon: Icons.restaurant,
+                            ),
+
+                            _StatCard(
+                              title: 'Balance',
+                              value: '৳ 12,500',
+                              icon: Icons.account_balance_wallet,
+                            ),
+
+                            _StatCard(
+                              title: 'Expenses',
+                              value: '৳ 4,200',
+                              icon: Icons.bar_chart,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 30),
+
+                  // RIGHT
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      height: 320,
+
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF171727),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 70,
+                            backgroundColor: const Color(0xFF5B55A3),
+
+                            child: Text(
+                              messName[0].toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 52,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          Text(
+                            messName,
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+
+                            child: Text(
+                              messDescription,
+                              textAlign: TextAlign.center,
+
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              final nameController =
+                                  TextEditingController(
+                                text: messName,
+                              );
+
+                              final descriptionController =
+                                  TextEditingController(
+                                text: messDescription,
+                              );
+
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    backgroundColor:
+                                        const Color(0xFF171727),
+
+                                    title: const Text(
+                                      'Edit Mess Profile',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    content: SizedBox(
+                                      width: 400,
+
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          TextField(
+                                            controller: nameController,
+
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+
+                                            decoration: InputDecoration(
+                                              labelText: 'Mess Name',
+
+                                              labelStyle: TextStyle(
+                                                color:
+                                                    Colors.grey.shade400,
+                                              ),
+                                            ),
+                                          ),
+
+                                          const SizedBox(height: 20),
+
+                                          TextField(
+                                            controller:
+                                                descriptionController,
+
+                                            maxLines: 3,
+
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+
+                                            decoration: InputDecoration(
+                                              labelText: 'Description',
+
+                                              labelStyle: TextStyle(
+                                                color:
+                                                    Colors.grey.shade400,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+
+                                        child: const Text('Cancel'),
+                                      ),
+
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          ref
+                                              .read(
+                                                messControllerProvider
+                                                    .notifier,
+                                              )
+                                              .updateMessProfile(
+                                                name:
+                                                    nameController.text,
+                                                description:
+                                                    descriptionController
+                                                        .text,
+                                              );
+
+                                          Navigator.pop(context);
+                                        },
+
+                                        child: const Text('Save'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color(0xFF5B55A3),
+
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                            ),
+
+                            icon: const Icon(Icons.edit),
+
+                            label: const Text('Edit Profile'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 30),
+
+              // QUICK ACTIONS
+              Row(
+                children: const [
+                  Expanded(
+                    child: _QuickActionCard(
+                      title: 'Add Meal',
+                      icon: Icons.restaurant_menu,
+                    ),
+                  ),
+
+                  SizedBox(width: 20),
+
+                  Expanded(
+                    child: _QuickActionCard(
+                      title: 'Add Expense',
+                      icon: Icons.payments,
+                    ),
+                  ),
+
+                  SizedBox(width: 20),
+
+                  Expanded(
+                    child: _QuickActionCard(
+                      title: 'Open Chat',
+                      icon: Icons.chat,
+                    ),
+                  ),
+
+                  SizedBox(width: 20),
+
+                  Expanded(
+                    child: _QuickActionCard(
+                      title: 'Invite Member',
+                      icon: Icons.person_add,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 30),
+
+              // MEMBERS
+              Container(
+                width: double.infinity,
+
+                padding: const EdgeInsets.all(24),
+
+                decoration: BoxDecoration(
+                  color: const Color(0xFF171727),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Mess Members',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    SizedBox(height: 24),
+
+                    _MemberTile(
+                      name: 'Raihan',
+                      role: 'Admin',
+                    ),
+
+                    _MemberTile(
+                      name: 'Sakib',
+                      role: 'Member',
+                    ),
+
+                    _MemberTile(
+                      name: 'Tanvir',
+                      role: 'Member',
+                    ),
+
+                    _MemberTile(
+                      name: 'Nabil',
+                      role: 'Member',
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -38,242 +383,163 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _DashboardContent extends StatelessWidget {
-  const _DashboardContent({
-    required this.snapshot,
-    required this.isDesktop,
-  });
+class _StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
 
-  final DashboardSnapshot snapshot;
-  final bool isDesktop;
+  const _StatCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        const MemberAvatarRow(),
-        Text(
-          'Dashboard overview',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Daily operations, finance and updates in one place.',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 16),
-        _buildPrimaryMetrics(context),
-        const SizedBox(height: 12),
-        _buildSecondaryMetrics(context),
-        const SizedBox(height: 12),
-        _buildQuickActions(context),
-        const SizedBox(height: 12),
-        DashboardCard(
-          title: 'Monthly expense summary',
-          trailing: TextButton(
-            onPressed: () => context.go('/expenses'),
-            child: const Text('Open'),
-          ),
-          child: const AnimatedChartPlaceholder(),
-        ),
-        const SizedBox(height: 12),
-        _buildStatsGrid(snapshot.stats),
-        const SizedBox(height: 12),
-        DashboardCard(
-          title: 'Recent activities',
-          child: RecentActivityList(activities: snapshot.activities),
-        ),
-        const SizedBox(height: 12),
-        DashboardCard(
-          title: 'Admin notices',
-          trailing: const Icon(Icons.campaign_rounded),
-          child: Column(
-            children: snapshot.adminNotices
-                .map(
-                  (notice) => ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(notice.title),
-                    subtitle: Text(notice.message),
-                    leading: const Icon(Icons.notifications_active_rounded),
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      ],
-    );
-  }
+    return Container(
+      width: 180,
 
-  Widget _buildPrimaryMetrics(BuildContext context) {
-    return isDesktop
-        ? Row(
-            children: [
-              Expanded(
-                child: _AmountCard(
-                  title: 'Current balance',
-                  amount: snapshot.currentBalance,
-                  icon: Icons.account_balance_wallet_rounded,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _AmountCard(
-                  title: 'Pending dues',
-                  amount: snapshot.pendingDues,
-                  icon: Icons.pending_actions_rounded,
-                ),
-              ),
-            ],
-          )
-        : Column(
-            children: [
-              _AmountCard(
-                title: 'Current balance',
-                amount: snapshot.currentBalance,
-                icon: Icons.account_balance_wallet_rounded,
-              ),
-              const SizedBox(height: 12),
-              _AmountCard(
-                title: 'Pending dues',
-                amount: snapshot.pendingDues,
-                icon: Icons.pending_actions_rounded,
-              ),
-            ],
-          );
-  }
+      padding: const EdgeInsets.all(20),
 
-  Widget _buildSecondaryMetrics(BuildContext context) {
-    return isDesktop
-        ? Row(
-            children: [
-              Expanded(
-                child: DashboardCard(
-                  title: "Today's meal",
-                  child: Text(snapshot.todayMeal),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DashboardCard(
-                  title: 'Upcoming market duty',
-                  child: Text(snapshot.upcomingMarketDuty),
-                ),
-              ),
-            ],
-          )
-        : Column(
-            children: [
-              DashboardCard(
-                title: "Today's meal",
-                child: Text(snapshot.todayMeal),
-              ),
-              const SizedBox(height: 12),
-              DashboardCard(
-                title: 'Upcoming market duty',
-                child: Text(snapshot.upcomingMarketDuty),
-              ),
-            ],
-          );
-  }
+      decoration: BoxDecoration(
+        color: const Color(0xFF171727),
+        borderRadius: BorderRadius.circular(24),
+      ),
 
-  Widget _buildQuickActions(BuildContext context) {
-    return DashboardCard(
-      title: 'Quick actions',
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _QuickActionChip(
-            icon: Icons.add_card_rounded,
-            label: 'Add Expense',
-            onTap: () => context.go('/expenses'),
+          Icon(
+            icon,
+            color: const Color(0xFF8E87FD),
+            size: 32,
           ),
-          _QuickActionChip(
-            icon: Icons.restaurant_menu_rounded,
-            label: 'Update Meal',
-            onTap: () => context.go('/meals'),
+
+          const SizedBox(height: 20),
+
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-          _QuickActionChip(
-            icon: Icons.forum_rounded,
-            label: 'Open Chat',
-            onTap: () => context.go('/chat'),
-          ),
-          _QuickActionChip(
-            icon: Icons.admin_panel_settings_rounded,
-            label: 'Admin Panel',
-            onTap: () => context.go('/admin'),
+
+          const SizedBox(height: 8),
+
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 16,
+            ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildStatsGrid(List<DashboardStat> stats) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: stats.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isDesktop ? 4 : 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: isDesktop ? 1.55 : 1.15,
-      ),
-      itemBuilder: (context, index) => StatisticsCard(stat: stats[index]),
-    );
-  }
 }
 
-class _AmountCard extends StatelessWidget {
-  const _AmountCard({
-    required this.title,
-    required this.amount,
-    required this.icon,
-  });
-
+class _QuickActionCard extends StatelessWidget {
   final String title;
-  final double amount;
   final IconData icon;
+
+  const _QuickActionCard({
+    required this.title,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return DashboardCard(
-      title: title,
-      trailing: Icon(icon),
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutCubic,
-        tween: Tween(begin: 0, end: amount),
-        builder: (context, value, child) {
-          return Text(
-            '৳${value.toStringAsFixed(0)}',
-            style: Theme.of(context).textTheme.headlineMedium,
-          );
-        },
+    return Container(
+      height: 105,
+
+      decoration: BoxDecoration(
+        color: const Color(0xFF171727),
+        borderRadius: BorderRadius.circular(24),
+      ),
+
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 32,
+            color: const Color(0xFF8E87FD),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _QuickActionChip extends StatelessWidget {
-  const _QuickActionChip({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+class _MemberTile extends StatelessWidget {
+  final String name;
+  final String role;
 
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
+  const _MemberTile({
+    required this.name,
+    required this.role,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 140,
-      child: QuickActionButton(
-        icon: icon,
-        label: label,
-        onTap: onTap,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+
+      padding: const EdgeInsets.all(18),
+
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F0F1B),
+        borderRadius: BorderRadius.circular(20),
+      ),
+
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: const Color(0xFF5B55A3),
+
+            child: Text(
+              name[0],
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          Expanded(
+            child: Text(
+              name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ),
+
+          Text(
+            role,
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 15,
+            ),
+          ),
+        ],
       ),
     );
   }

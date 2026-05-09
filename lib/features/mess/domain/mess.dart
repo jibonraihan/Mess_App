@@ -1,39 +1,48 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+class Mess {
+  final String id;
+  final String name;
+  final DateTime createdAt;
+  final String inviteCode;
+  final String adminId;
+  final List<String> memberIds;
 
-part 'mess.freezed.dart';
+  // NEW
+  final String? avatarUrl;
+  final String? description;
 
-// Enum for user roles within a mess
-enum UserRole {
-  @JsonValue('admin')
-  admin,
-  @JsonValue('coAdmin')
-  coAdmin,
-  @JsonValue('member')
-  member,
-}
+  const Mess({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+    required this.inviteCode,
+    required this.adminId,
+    required this.memberIds,
 
-// Represents a user's membership in a mess
-@freezed
-class Membership with _$Membership {
-  const factory Membership({
-    required String userId,
-    required String messId,
-    required UserRole role,
-    required DateTime joinedAt,
-  }) = _Membership;
-}
+    this.avatarUrl,
+    this.description,
+  });
 
-// Represents a single mess
-@freezed
-class Mess with _$Mess {
-  const factory Mess({
-    required String id,
-    required String name,
-    required String inviteCode,
-    required String adminId, // ID of the user who is the primary admin
-    required List<String> memberIds, // List of user IDs who are members
-    String? avatar,
-    required DateTime createdAt,
-  }) = _Mess;
+  Mess copyWith({
+    String? id,
+    String? name,
+    DateTime? createdAt,
+    String? inviteCode,
+    String? adminId,
+    List<String>? memberIds,
+
+    String? avatarUrl,
+    String? description,
+  }) {
+    return Mess(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      inviteCode: inviteCode ?? this.inviteCode,
+      adminId: adminId ?? this.adminId,
+      memberIds: memberIds ?? this.memberIds,
+
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      description: description ?? this.description,
+    );
+  }
 }
