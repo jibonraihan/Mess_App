@@ -1,131 +1,300 @@
-import 'package:mess_app/features/mess/data/mess_repository.dart';
-import 'package:mess_app/features/mess/domain/mess.dart';
-import 'package:mess_app/features/mess/application/mess_state.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
-import '../../auth/application/auth_controller.dart';
+import 'dart:typed_data';
 
-// Provider for the MessRepository
-final messRepositoryProvider = Provider<MessRepository>((ref) {
-  // In a real app, this would be a service that interacts with a database or API
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/services/local_storage_service.dart';
+import '../../auth/application/auth_controller.dart';
+import '../data/mess_repository.dart';
+import '../domain/mess.dart';
+import 'mess_state.dart';
+
+final messRepositoryProvider =
+    Provider<MessRepository>((ref) {
   return InMemoryMessRepository();
 });
 
-// StateNotifierProvider for managing the current mess and user's mess data
 final messControllerProvider =
-    StateNotifierProvider<MessController, MessState>((ref) {
+    StateNotifierProvider<
+      MessController,
+      MessState
+    >((ref) {
+      final repository =
+          ref.watch(
+            messRepositoryProvider,
+          );
 
-  final repository = ref.watch(messRepositoryProvider);
+      return MessController(
+        ref,
+        repository,
+      );
+    });
 
-  return MessController(ref, repository);
-});
-
-class MessController extends StateNotifier<MessState> {
+class MessController
+    extends StateNotifier<MessState> {
   final Ref ref;
-  MessController(this.ref, this._repository) : super(const MessState.loading()) {
-    // Load the user's mess when the controller is initialized
+  final MessRepository _repository;
+
+  final String _userId =
+      'mock-user-id';
+
+  Mess? _currentMess;
+
+  MessController(
+    this.ref,
+    this._repository,
+  ) : super(
+         const MessState.loading(),
+       ) {
     loadUserMess();
   }
 
-  final MessRepository _repository;
-  final String _userId = 'mock-user-id';
-
-  // Fetch the mess the user belongs to
+  // LOAD MESS
   Future<void> loadUserMess() async {
     try {
-      final mess = _repository.getUserMess(_userId);
+      final savedName =
+          await LocalStorageService
+              .getMessName();
+
+      final savedDescription =
+          await LocalStorageService
+              .getDescription();
+
+      final savedAvatar =
+          await LocalStorageService
+              .getAvatar();
+
+      // IF SAVED DATA EXISTS
+      // RESTORE DIRECTLY
+      if (savedName != null) {
+        _currentMess = Mess(
+          id: 'saved-mess',
+
+          name: savedName,
+
+          createdAt:
+              DateTime.now(),
+
+          inviteCode: 'LOCAL01',
+
+          adminId: _userId,
+
+          memberIds: [_userId],
+
+          description:
+              savedDescription,
+
+          avatarBytes:
+              savedAvatar,
+        );
+
+        state = MessState.loaded(
+          mess: _currentMess!,
+        );
+
+        return;
+      }
+
+      // NO SAVED DATA
+      final mess =
+          _repository.getUserMess(
+        _userId,
+      );
+
       if (mess != null) {
-        state = MessState.loaded(mess: mess);
+        _currentMess = mess;
+
+        state = MessState.loaded(
+          mess: mess,
+        );
       } else {
-        // If user is not in any mess, set state to notInMess
-        state = const MessState.notInMess();
+        state =
+            const MessState.notInMess();
       }
     } catch (e) {
-      state = MessState.error(message: 'Failed to load mess data: ${e.toString()}');
+      state = MessState.error(
+        message:
+            'Failed to load mess: ${e.toString()}',
+      );
     }
   }
 
-  // Create a new mess
-Future<void> createMess(String messName) async {
-  state = const MessState.loading();
-
-  try {
-    // Generate invite code
-    final inviteCode = _generateInviteCode();
-
-    final newMess = Mess(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: messName,
-      createdAt: DateTime.now(),
-      inviteCode: inviteCode,
-      adminId: _userId,
-      memberIds: [_userId],
-    );
-
-    await _repository.createMess(newMess);
-
-    // COMPLETE ONBOARDING
-    final authNotifier = ref.read(authControllerProvider.notifier);
-    authNotifier.completeOnboarding();
-
-    // UPDATE STATE
-    state = MessState.loaded(mess: newMess);
-  } catch (e) {
-    state = MessState.error(
-      message: 'Failed to create mess: ${e.toString()}',
-    );
-  }
-}
-
-  // Join a mess using an invite code
-  Future<void> joinMess(String inviteCode) async {
+  // CREATE MESS
+  Future<void> createMess(
+    String messName,
+  ) async {
     state = const MessState.loading();
+
     try {
-      await _repository.joinMess(_userId, inviteCode);
-      // Re-fetch the mess data to confirm join
-      loadUserMess();
+      final inviteCode =
+          _generateInviteCode();
+
+      final newMess = Mess(
+        id: DateTime.now()
+            .millisecondsSinceEpoch
+            .toString(),
+
+        name: messName,
+
+        createdAt: DateTime.now(),
+
+        inviteCode: inviteCode,
+
+        adminId: _userId,
+
+        memberIds: [_userId],
+      );
+
+      _currentMess = newMess;
+
+      // SAVE LOCALLY
+      await LocalStorageService
+          .saveMessName(
+        messName,
+      );
+
+      await LocalStorageService
+          .saveDescription('');
+
+      ref
+          .read(
+            authControllerProvider
+                .notifier,
+          )
+          .completeOnboarding();
+
+      state = MessState.loaded(
+        mess: newMess,
+      );
     } catch (e) {
-      state = MessState.error(message: 'Failed to join mess: ${e.toString()}');
+      state = MessState.error(
+        message:
+            'Failed to create mess: ${e.toString()}',
+      );
     }
   }
 
-  // Leave the current mess
-  Future<void> leaveMess() async {
+  // JOIN MESS
+  Future<void> joinMess(
+    String inviteCode,
+  ) async {
     state = const MessState.loading();
-    try {
-      final currentState = state;
-    } catch (e) {
-      state = MessState.error(message: 'Failed to leave mess: ${e.toString()}');
-    }
-  }
-  // UPDATE MESS PROFILE
-void updateMessProfile({
-  required String name,
-  String? description,
-  String? avatarUrl,
-}) {
-  final currentState = state;
 
-  currentState.whenOrNull(
-    loaded: (mess) {
-      final updatedMess = mess.copyWith(
-        name: name,
-        description: description,
-        avatarUrl: avatarUrl,
+    try {
+      final joinedMess = Mess(
+        id: 'joined-mess',
+
+        name: 'Joined Mess',
+
+        createdAt: DateTime.now(),
+
+        inviteCode: inviteCode,
+
+        adminId: _userId,
+
+        memberIds: [_userId],
+      );
+
+      _currentMess = joinedMess;
+
+      await LocalStorageService
+          .saveMessName(
+        joinedMess.name,
       );
 
       state = MessState.loaded(
-        mess: updatedMess,
+        mess: joinedMess,
       );
-    },
-  );
-}
+    } catch (e) {
+      state = MessState.error(
+        message:
+            'Failed to join mess: ${e.toString()}',
+      );
+    }
+  }
 
-  // Generate a unique invite code (simple mock implementation)
+  // UPDATE PROFILE
+  Future<void> updateMessProfile({
+    required String name,
+    String? description,
+    Uint8List? avatarBytes,
+    bool removeAvatar = false,
+  }) async {
+    if (_currentMess == null) {
+      _currentMess = Mess(
+        id: 'saved-mess',
+
+        name: name,
+
+        createdAt: DateTime.now(),
+
+        inviteCode: 'LOCAL01',
+
+        adminId: _userId,
+
+        memberIds: [_userId],
+      );
+    }
+
+    _currentMess = _currentMess!.copyWith(
+      name: name.trim(),
+
+      description:
+          description?.trim(),
+
+      avatarBytes:
+          removeAvatar
+              ? null
+              : avatarBytes,
+    );
+
+    // SAVE LOCALLY
+    await LocalStorageService
+        .saveMessName(
+      _currentMess!.name,
+    );
+
+    await LocalStorageService
+        .saveDescription(
+      _currentMess!.description ?? '',
+    );
+
+    if (removeAvatar) {
+      await LocalStorageService
+          .removeAvatar();
+    } else if (avatarBytes != null) {
+      await LocalStorageService
+          .saveAvatar(
+        avatarBytes,
+      );
+    }
+
+    state = MessState.loaded(
+      mess: _currentMess!,
+    );
+  }
+
+  // LEAVE MESS
+  Future<void> leaveMess() async {
+    _currentMess = null;
+
+    state =
+        const MessState.notInMess();
+  }
+
+  // INVITE CODE
   String _generateInviteCode() {
-    // In a real app, this would be more robust, ensuring uniqueness
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
     final random = Random();
-    return List.generate(6, (index) => chars[random.nextInt(chars.length)]).join();
+
+    return List.generate(
+      6,
+      (index) => chars[
+          random.nextInt(
+            chars.length,
+          )],
+    ).join();
   }
 }

@@ -18,7 +18,7 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
   final _messNameController = TextEditingController();
   String? _errorMessage;
   String? _generatedCode;
-  bool _isSuccess = false;
+  final bool _isSuccess = false;
 
   @override
   void dispose() {

@@ -283,7 +283,7 @@ Future<void> _showAddExpenseSheet(BuildContext context, WidgetRef ref) async {
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<ExpenseCategory>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   items: ExpenseCategory.values
                       .map(
                         (category) => DropdownMenuItem(

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class Mess {
   final String id;
   final String name;
@@ -6,9 +8,8 @@ class Mess {
   final String adminId;
   final List<String> memberIds;
 
-  // NEW
-  final String? avatarUrl;
   final String? description;
+  final Uint8List? avatarBytes;
 
   const Mess({
     required this.id,
@@ -18,31 +19,42 @@ class Mess {
     required this.adminId,
     required this.memberIds,
 
-    this.avatarUrl,
     this.description,
+    this.avatarBytes,
   });
 
   Mess copyWith({
-    String? id,
-    String? name,
-    DateTime? createdAt,
-    String? inviteCode,
-    String? adminId,
-    List<String>? memberIds,
+  String? id,
+  String? name,
+  DateTime? createdAt,
+  String? inviteCode,
+  String? adminId,
+  List<String>? memberIds,
+  String? description,
 
-    String? avatarUrl,
-    String? description,
-  }) {
-    return Mess(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      createdAt: createdAt ?? this.createdAt,
-      inviteCode: inviteCode ?? this.inviteCode,
-      adminId: adminId ?? this.adminId,
-      memberIds: memberIds ?? this.memberIds,
+  Uint8List? avatarBytes,
+  bool removeAvatar = false,
+}) {
+  return Mess(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    createdAt:
+        createdAt ?? this.createdAt,
+    inviteCode:
+        inviteCode ?? this.inviteCode,
+    adminId:
+        adminId ?? this.adminId,
+    memberIds:
+        memberIds ?? this.memberIds,
 
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      description: description ?? this.description,
-    );
-  }
+    description:
+        description ?? this.description,
+
+    avatarBytes:
+        removeAvatar
+            ? null
+            : avatarBytes ??
+                this.avatarBytes,
+  );
+}
 }

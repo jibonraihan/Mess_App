@@ -17,11 +17,7 @@ class MemberAvatar {
 }
 
 class MemberAvatarRow extends StatelessWidget {
-  const MemberAvatarRow({
-    super.key,
-    required this.members,
-    this.onMemberTap,
-  });
+  const MemberAvatarRow({super.key, required this.members, this.onMemberTap});
 
   final List<MemberAvatar> members;
   final Function(MemberAvatar)? onMemberTap;
@@ -41,7 +37,9 @@ class MemberAvatarRow extends StatelessWidget {
             children: [
               Text(
                 'Members',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -68,8 +66,9 @@ class MemberAvatarRow extends StatelessWidget {
                     Stack(
                       children: [
                         AvatarImage(
-                          imageUrl: member.imageUrl,
-                          radius: 30,
+                          imageBytes: null,
+                          radius: 20,
+                          fallbackText: member.name,
                         ),
                         if (member.isOnline)
                           Positioned(

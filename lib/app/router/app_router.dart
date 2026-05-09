@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +26,7 @@ import '../../features/mess/presentation/screens/join_mess_screen.dart';
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/auth/signup',
+    //initialLocation: '/home',
 
     // NO AUTO REDIRECTS
     redirect: (context, state) {

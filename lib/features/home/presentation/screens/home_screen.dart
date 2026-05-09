@@ -1,25 +1,60 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../mess/application/mess_controller.dart';
+import 'package:image_picker/image_picker.dart';
 
-class HomeScreen extends ConsumerWidget {
+import '../../../mess/application/mess_controller.dart';
+import '../../../mess/domain/mess.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
     final messState = ref.watch(messControllerProvider);
 
-    final mess = messState.maybeWhen(
-      loaded: (mess) => mess,
-      orElse: () => null,
-    );
+    Mess? mess;
 
-    final messName = mess?.name ?? 'My Community';
+messState.maybeWhen(
+  loaded: (loadedMess) {
+    mess = loadedMess;
+  },
+  orElse: () {},
+);
+   if (mess == null) {
+  return const Scaffold(
+    backgroundColor: Color(0xFF0B0B16),
 
-    final messDescription =
-        mess?.description?.trim().isNotEmpty == true
-            ? mess!.description!
-            : 'No description yet';
+    body: Center(
+      child: Text(
+        'No mess data',
+
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+    ),
+  );
+}
+
+    final currentMess = mess!;
+
+final messName =
+    currentMess.name;
+
+final messDescription =
+    currentMess.description != null &&
+            currentMess.description!
+                .trim()
+                .isNotEmpty
+        ? currentMess.description!
+        : 'No description yet';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B0B16),
@@ -35,14 +70,17 @@ class HomeScreen extends ConsumerWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // LEFT
+                  // LEFT SIDE
                   Expanded(
                     flex: 3,
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+
                       children: [
                         Text(
                           messName,
+
                           style: const TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
@@ -54,6 +92,7 @@ class HomeScreen extends ConsumerWidget {
 
                         Text(
                           'Welcome back, Admin 👋',
+
                           style: TextStyle(
                             color: Colors.grey.shade400,
                             fontSize: 18,
@@ -65,6 +104,7 @@ class HomeScreen extends ConsumerWidget {
                         Wrap(
                           spacing: 20,
                           runSpacing: 20,
+
                           children: const [
                             _StatCard(
                               title: 'Members',
@@ -97,38 +137,49 @@ class HomeScreen extends ConsumerWidget {
 
                   const SizedBox(width: 30),
 
-                  // RIGHT
+                  // RIGHT SIDE
                   Expanded(
                     flex: 2,
+
                     child: Container(
                       height: 320,
 
                       decoration: BoxDecoration(
                         color: const Color(0xFF171727),
+
                         borderRadius: BorderRadius.circular(30),
                       ),
 
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+
                         children: [
                           CircleAvatar(
                             radius: 70,
                             backgroundColor: const Color(0xFF5B55A3),
 
-                            child: Text(
-                              messName[0].toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 52,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                            backgroundImage: mess?.avatarBytes != null
+                                ? MemoryImage(mess!.avatarBytes!)
+                                : null,
+
+                            child: mess?.avatarBytes == null
+                                ? Text(
+                                    messName.substring(0, 1).toUpperCase(),
+
+                                    style: const TextStyle(
+                                      fontSize: 52,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : null,
                           ),
 
                           const SizedBox(height: 24),
 
                           Text(
                             messName,
+
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -139,16 +190,14 @@ class HomeScreen extends ConsumerWidget {
                           const SizedBox(height: 10),
 
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
 
                             child: Text(
                               messDescription,
+
                               textAlign: TextAlign.center,
 
-                              style: TextStyle(
-                                color: Colors.grey.shade400,
-                              ),
+                              style: TextStyle(color: Colors.grey.shade400),
                             ),
                           ),
 
@@ -156,119 +205,426 @@ class HomeScreen extends ConsumerWidget {
 
                           ElevatedButton.icon(
                             onPressed: () {
-                              final nameController =
-                                  TextEditingController(
+                              final nameController = TextEditingController(
                                 text: messName,
                               );
 
                               final descriptionController =
-                                  TextEditingController(
-                                text: messDescription,
-                              );
+                                  TextEditingController(text: messDescription);
+
+                              Uint8List? selectedAvatar = mess?.avatarBytes;
 
                               showDialog(
                                 context: context,
+
                                 builder: (context) {
-                                  return AlertDialog(
-                                    backgroundColor:
-                                        const Color(0xFF171727),
+                                  return StatefulBuilder(
+                                    builder: (context, setStateDialog) {
+                                      return AlertDialog(
+                                        backgroundColor: const Color(
+                                          0xFF171727,
+                                        ),
 
-                                    title: const Text(
-                                      'Edit Mess Profile',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                                        title: const Text(
+                                          'Edit Mess Profile',
 
-                                    content: SizedBox(
-                                      width: 400,
+                                          style: TextStyle(color: Colors.white),
+                                        ),
 
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          TextField(
-                                            controller: nameController,
+                                        content: SizedBox(
+                                          width: 400,
 
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                            ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
 
-                                            decoration: InputDecoration(
-                                              labelText: 'Mess Name',
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  await showModalBottomSheet(
+                                                    context: context,
 
-                                              labelStyle: TextStyle(
-                                                color:
-                                                    Colors.grey.shade400,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+
+                                                    barrierColor:
+                                                        Colors.black54,
+
+                                                    isScrollControlled: true,
+
+                                                    builder: (context) {
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets.only(
+                                                              left: 24,
+                                                              right: 24,
+                                                              bottom: 120,
+                                                            ),
+
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+
+                                                          child: Container(
+                                                            width: 360,
+
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  vertical: 10,
+                                                                ),
+
+                                                            decoration: BoxDecoration(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF171727,
+                                                                  ),
+
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    28,
+                                                                  ),
+                                                            ),
+
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+
+                                                              children: [
+                                                                if (selectedAvatar !=
+                                                                    null)
+                                                                  Material(
+                                                                    color: Colors
+                                                                        .transparent,
+
+                                                                    child: InkWell(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            18,
+                                                                          ),
+
+                                                                      splashColor:
+                                                                          const Color(
+                                                                            0xFF5B55A3,
+                                                                          ).withOpacity(
+                                                                            0.25,
+                                                                          ),
+
+                                                                      highlightColor:
+                                                                          const Color(
+                                                                            0xFF5B55A3,
+                                                                          ).withOpacity(
+                                                                            0.12,
+                                                                          ),
+
+                                                                      onTap: () {
+                                                                        Navigator.pop(
+                                                                          context,
+                                                                        );
+
+                                                                        showDialog(
+                                                                          context:
+                                                                              context,
+
+                                                                          builder: (_) {
+                                                                            return Dialog(
+                                                                              backgroundColor: Colors.transparent,
+
+                                                                              child: ClipRRect(
+                                                                                borderRadius: BorderRadius.circular(
+                                                                                  24,
+                                                                                ),
+
+                                                                                child: Image.memory(
+                                                                                  selectedAvatar!,
+                                                                                  fit: BoxFit.cover,
+                                                                                ),
+                                                                              ),
+                                                                            );
+                                                                          },
+                                                                        );
+                                                                      },
+
+                                                                      child: const ListTile(
+                                                                        leading: Icon(
+                                                                          Icons
+                                                                              .image,
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+
+                                                                        title: Text(
+                                                                          'See Photo',
+
+                                                                          style: TextStyle(
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+
+                                                                Material(
+                                                                  color: Colors
+                                                                      .transparent,
+
+                                                                  child: InkWell(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          18,
+                                                                        ),
+
+                                                                    splashColor:
+                                                                        const Color(
+                                                                          0xFF5B55A3,
+                                                                        ).withOpacity(
+                                                                          0.25,
+                                                                        ),
+
+                                                                    highlightColor:
+                                                                        const Color(
+                                                                          0xFF5B55A3,
+                                                                        ).withOpacity(
+                                                                          0.12,
+                                                                        ),
+
+                                                                    onTap: () async {
+                                                                      Navigator.pop(
+                                                                        context,
+                                                                      );
+
+                                                                      final picker =
+                                                                          ImagePicker();
+
+                                                                      final image = await picker.pickImage(
+                                                                        source:
+                                                                            ImageSource.gallery,
+                                                                      );
+
+                                                                      if (image !=
+                                                                          null) {
+                                                                        final bytes =
+                                                                            await image.readAsBytes();
+
+                                                                        setStateDialog(() {
+                                                                          selectedAvatar =
+                                                                              bytes;
+                                                                        });
+                                                                      }
+                                                                    },
+
+                                                                    child: const ListTile(
+                                                                      leading: Icon(
+                                                                        Icons
+                                                                            .photo_library,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+
+                                                                      title: Text(
+                                                                        'Choose Photo',
+
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+
+                                                                if (selectedAvatar !=
+                                                                    null)
+                                                                  Material(
+                                                                    color: Colors
+                                                                        .transparent,
+
+                                                                    child: InkWell(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            18,
+                                                                          ),
+
+                                                                      splashColor: Colors
+                                                                          .red
+                                                                          .withOpacity(
+                                                                            0.25,
+                                                                          ),
+
+                                                                      highlightColor: Colors
+                                                                          .red
+                                                                          .withOpacity(
+                                                                            0.12,
+                                                                          ),
+
+                                                                      onTap: () {
+                                                                        Navigator.pop(
+                                                                          context,
+                                                                        );
+
+                                                                        setStateDialog(() {
+                                                                          selectedAvatar =
+                                                                              null;
+                                                                          ref
+                                                                              .read(
+                                                                                messControllerProvider.notifier,
+                                                                              )
+                                                                              .updateMessProfile(
+                                                                                name: nameController.text,
+                                                                                description: descriptionController.text,
+                                                                                removeAvatar: true,
+                                                                              );
+                                                                        });
+                                                                      },
+
+                                                                      child: const ListTile(
+                                                                        leading: Icon(
+                                                                          Icons
+                                                                              .delete,
+                                                                          color:
+                                                                              Colors.red,
+                                                                        ),
+
+                                                                        title: Text(
+                                                                          'Remove Photo',
+
+                                                                          style: TextStyle(
+                                                                            color:
+                                                                                Colors.red,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+
+                                                child: CircleAvatar(
+                                                  radius: 45,
+
+                                                  backgroundColor: const Color(
+                                                    0xFF5B55A3,
+                                                  ),
+
+                                                  backgroundImage:
+                                                      selectedAvatar != null
+                                                      ? MemoryImage(
+                                                          selectedAvatar!,
+                                                        )
+                                                      : null,
+
+                                                  child: selectedAvatar == null
+                                                      ? const Icon(
+                                                          Icons.camera_alt,
+                                                          color: Colors.white,
+                                                          size: 30,
+                                                        )
+                                                      : null,
+                                                ),
                                               ),
-                                            ),
+
+                                              const SizedBox(height: 24),
+
+                                              TextField(
+                                                controller: nameController,
+
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                ),
+
+                                                decoration: InputDecoration(
+                                                  labelText: 'Mess Name',
+
+                                                  labelStyle: TextStyle(
+                                                    color: Colors.grey.shade400,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              const SizedBox(height: 20),
+
+                                              TextField(
+                                                controller:
+                                                    descriptionController,
+
+                                                maxLines: 3,
+
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                ),
+
+                                                decoration: InputDecoration(
+                                                  labelText: 'Description',
+
+                                                  labelStyle: TextStyle(
+                                                    color: Colors.grey.shade400,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+
+                                            child: const Text('Cancel'),
                                           ),
 
-                                          const SizedBox(height: 20),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: const Color(
+                                                0xFF5B55A3,
+                                              ),
 
-                                          TextField(
-                                            controller:
-                                                descriptionController,
-
-                                            maxLines: 3,
-
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                            ),
-
-                                            decoration: InputDecoration(
-                                              labelText: 'Description',
-
-                                              labelStyle: TextStyle(
-                                                color:
-                                                    Colors.grey.shade400,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
                                               ),
                                             ),
+
+                                            onPressed: () {
+                                              ref
+                                                  .read(
+                                                    messControllerProvider
+                                                        .notifier,
+                                                  )
+                                                  .updateMessProfile(
+                                                    name: nameController.text,
+
+                                                    description:
+                                                        descriptionController
+                                                            .text,
+
+                                                    avatarBytes: selectedAvatar,
+                                                  );
+
+                                              Navigator.pop(context);
+                                            },
+
+                                            child: const Text('Save'),
                                           ),
                                         ],
-                                      ),
-                                    ),
-
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-
-                                        child: const Text('Cancel'),
-                                      ),
-
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          ref
-                                              .read(
-                                                messControllerProvider
-                                                    .notifier,
-                                              )
-                                              .updateMessProfile(
-                                                name:
-                                                    nameController.text,
-                                                description:
-                                                    descriptionController
-                                                        .text,
-                                              );
-
-                                          Navigator.pop(context);
-                                        },
-
-                                        child: const Text('Save'),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   );
                                 },
                               );
                             },
 
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFF5B55A3),
+                              backgroundColor: const Color(0xFF5B55A3),
 
-                              padding:
-                                  const EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 14,
                               ),
@@ -336,14 +692,17 @@ class HomeScreen extends ConsumerWidget {
 
                 decoration: BoxDecoration(
                   color: const Color(0xFF171727),
+
                   borderRadius: BorderRadius.circular(30),
                 ),
 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: const [
                     Text(
                       'Mess Members',
+
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
@@ -353,25 +712,13 @@ class HomeScreen extends ConsumerWidget {
 
                     SizedBox(height: 24),
 
-                    _MemberTile(
-                      name: 'Raihan',
-                      role: 'Admin',
-                    ),
+                    _MemberTile(name: 'Raihan', role: 'Admin'),
 
-                    _MemberTile(
-                      name: 'Sakib',
-                      role: 'Member',
-                    ),
+                    _MemberTile(name: 'Sakib', role: 'Member'),
 
-                    _MemberTile(
-                      name: 'Tanvir',
-                      role: 'Member',
-                    ),
+                    _MemberTile(name: 'Tanvir', role: 'Member'),
 
-                    _MemberTile(
-                      name: 'Nabil',
-                      role: 'Member',
-                    ),
+                    _MemberTile(name: 'Nabil', role: 'Member'),
                   ],
                 ),
               ),
@@ -403,22 +750,21 @@ class _StatCard extends StatelessWidget {
 
       decoration: BoxDecoration(
         color: const Color(0xFF171727),
+
         borderRadius: BorderRadius.circular(24),
       ),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
-          Icon(
-            icon,
-            color: const Color(0xFF8E87FD),
-            size: 32,
-          ),
+          Icon(icon, color: const Color(0xFF8E87FD), size: 32),
 
           const SizedBox(height: 20),
 
           Text(
             value,
+
             style: const TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
@@ -430,10 +776,8 @@ class _StatCard extends StatelessWidget {
 
           Text(
             title,
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 16,
-            ),
+
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
           ),
         ],
       ),
@@ -445,10 +789,7 @@ class _QuickActionCard extends StatelessWidget {
   final String title;
   final IconData icon;
 
-  const _QuickActionCard({
-    required this.title,
-    required this.icon,
-  });
+  const _QuickActionCard({required this.title, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -457,26 +798,22 @@ class _QuickActionCard extends StatelessWidget {
 
       decoration: BoxDecoration(
         color: const Color(0xFF171727),
+
         borderRadius: BorderRadius.circular(24),
       ),
 
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+
         children: [
-          Icon(
-            icon,
-            size: 32,
-            color: const Color(0xFF8E87FD),
-          ),
+          Icon(icon, size: 32, color: const Color(0xFF8E87FD)),
 
           const SizedBox(height: 10),
 
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-            ),
+
+            style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
         ],
       ),
@@ -488,10 +825,7 @@ class _MemberTile extends StatelessWidget {
   final String name;
   final String role;
 
-  const _MemberTile({
-    required this.name,
-    required this.role,
-  });
+  const _MemberTile({required this.name, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -502,6 +836,7 @@ class _MemberTile extends StatelessWidget {
 
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F1B),
+
         borderRadius: BorderRadius.circular(20),
       ),
 
@@ -509,10 +844,12 @@ class _MemberTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 26,
+
             backgroundColor: const Color(0xFF5B55A3),
 
             child: Text(
               name[0],
+
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -525,19 +862,15 @@ class _MemberTile extends StatelessWidget {
           Expanded(
             child: Text(
               name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
+
+              style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
           ),
 
           Text(
             role,
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 15,
-            ),
+
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 15),
           ),
         ],
       ),
