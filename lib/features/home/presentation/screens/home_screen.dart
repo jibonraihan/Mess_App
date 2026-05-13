@@ -21,38 +21,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     Mess? mess;
 
-messState.maybeWhen(
-  loaded: (loadedMess) {
-    mess = loadedMess;
-  },
-  orElse: () {},
-);
-   if (mess == null) {
-  return const Scaffold(
-    backgroundColor: Color(0xFF0B0B16),
+    messState.maybeWhen(
+      loaded: (loadedMess) {
+        mess = loadedMess;
+      },
+      orElse: () {},
+    );
+    if (mess == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0B0B16),
 
-    body: Center(
-      child: Text(
-        'No mess data',
-
-        style: TextStyle(
-          color: Colors.white,
+        body: Center(
+          child: Text('No mess data', style: TextStyle(color: Colors.white)),
         ),
-      ),
-    ),
-  );
-}
+      );
+    }
 
     final currentMess = mess!;
 
-final messName =
-    currentMess.name;
+    final messName = currentMess.name;
 
-final messDescription =
-    currentMess.description != null &&
-            currentMess.description!
-                .trim()
-                .isNotEmpty
+    final messDescription =
+        currentMess.description != null &&
+            currentMess.description!.trim().isNotEmpty
         ? currentMess.description!
         : 'No description yet';
 
@@ -67,22 +58,72 @@ final messDescription =
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // TOP SECTION
-              Row(
+              // TOP SECTION
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+
                 children: [
-                  // LEFT SIDE
-                  Expanded(
-                    flex: 3,
+                  Text(
+                    messName,
+
+                    style: const TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Text(
+                    'Welcome back, Admin 👋',
+
+                    style: TextStyle(color: Colors.grey.shade400, fontSize: 18),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  /// PROFILE CARD
+                  Container(
+                    width: double.infinity,
+
+                    padding: const EdgeInsets.all(28),
+
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF171727),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
 
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
+                        CircleAvatar(
+                          radius: 70,
+                          backgroundColor: const Color(0xFF5B55A3),
+
+                          backgroundImage: mess?.avatarBytes != null
+                              ? MemoryImage(mess!.avatarBytes!)
+                              : null,
+
+                          child: mess?.avatarBytes == null
+                              ? Text(
+                                  messName.substring(0, 1).toUpperCase(),
+
+                                  style: const TextStyle(
+                                    fontSize: 52,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : null,
+                        ),
+
+                        const SizedBox(height: 24),
+
                         Text(
                           messName,
 
                           style: const TextStyle(
-                            fontSize: 40,
+                            fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -90,280 +131,111 @@ final messDescription =
 
                         const SizedBox(height: 10),
 
-                        Text(
-                          'Welcome back, Admin 👋',
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                          style: TextStyle(
-                            color: Colors.grey.shade400,
-                            fontSize: 18,
+                          child: Text(
+                            messDescription,
+
+                            textAlign: TextAlign.center,
+
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
 
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 24),
 
-                        Wrap(
-                          spacing: 20,
-                          runSpacing: 20,
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            final nameController = TextEditingController(
+                              text: messName,
+                            );
 
-                          children: const [
-                            _StatCard(
-                              title: 'Members',
-                              value: '12',
-                              icon: Icons.group,
-                            ),
+                            final descriptionController = TextEditingController(
+                              text: messDescription,
+                            );
 
-                            _StatCard(
-                              title: 'Today Meals',
-                              value: '26',
-                              icon: Icons.restaurant,
-                            ),
+                            Uint8List? selectedAvatar = mess?.avatarBytes;
+                            bool avatarRemoved = selectedAvatar == null;
 
-                            _StatCard(
-                              title: 'Balance',
-                              value: '৳ 12,500',
-                              icon: Icons.account_balance_wallet,
-                            ),
+                            showDialog(
+                              context: context,
 
-                            _StatCard(
-                              title: 'Expenses',
-                              value: '৳ 4,200',
-                              icon: Icons.bar_chart,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                              builder: (context) {
+                                return StatefulBuilder(
+                                  builder: (context, setStateDialog) {
+                                    return AlertDialog(
+                                      backgroundColor: const Color(0xFF171727),
 
-                  const SizedBox(width: 30),
+                                      title: const Text(
+                                        'Edit Mess Profile',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
 
-                  // RIGHT SIDE
-                  Expanded(
-                    flex: 2,
+                                      content: SizedBox(
+                                        width: 400,
 
-                    child: Container(
-                      height: 320,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
 
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF171727),
+                                          children: [
+                                            /// PROFILE IMAGE
+                                            GestureDetector(
+                                              onTap: () async {
+                                                await showModalBottomSheet(
+                                                  context: context,
 
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                                                  backgroundColor:
+                                                      Colors.transparent,
 
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                                                  barrierColor: Colors.black54,
 
-                        children: [
-                          CircleAvatar(
-                            radius: 70,
-                            backgroundColor: const Color(0xFF5B55A3),
+                                                  isScrollControlled: true,
 
-                            backgroundImage: mess?.avatarBytes != null
-                                ? MemoryImage(mess!.avatarBytes!)
-                                : null,
+                                                  builder: (context) {
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            left: 24,
+                                                            right: 24,
+                                                            bottom: 120,
+                                                          ),
 
-                            child: mess?.avatarBytes == null
-                                ? Text(
-                                    messName.substring(0, 1).toUpperCase(),
+                                                      child: Align(
+                                                        alignment: Alignment
+                                                            .bottomCenter,
 
-                                    style: const TextStyle(
-                                      fontSize: 52,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : null,
-                          ),
+                                                        child: Container(
+                                                          width: 360,
 
-                          const SizedBox(height: 24),
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                vertical: 10,
+                                                              ),
 
-                          Text(
-                            messName,
-
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-
-                            child: Text(
-                              messDescription,
-
-                              textAlign: TextAlign.center,
-
-                              style: TextStyle(color: Colors.grey.shade400),
-                            ),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              final nameController = TextEditingController(
-                                text: messName,
-                              );
-
-                              final descriptionController =
-                                  TextEditingController(text: messDescription);
-
-                              Uint8List? selectedAvatar = mess?.avatarBytes;
-
-                              showDialog(
-                                context: context,
-
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setStateDialog) {
-                                      return AlertDialog(
-                                        backgroundColor: const Color(
-                                          0xFF171727,
-                                        ),
-
-                                        title: const Text(
-                                          'Edit Mess Profile',
-
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-
-                                        content: SizedBox(
-                                          width: 400,
-
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  await showModalBottomSheet(
-                                                    context: context,
-
-                                                    backgroundColor:
-                                                        Colors.transparent,
-
-                                                    barrierColor:
-                                                        Colors.black54,
-
-                                                    isScrollControlled: true,
-
-                                                    builder: (context) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                              left: 24,
-                                                              right: 24,
-                                                              bottom: 120,
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(
+                                                              0xFF171727,
                                                             ),
 
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .bottomCenter,
-
-                                                          child: Container(
-                                                            width: 360,
-
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  vertical: 10,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  28,
                                                                 ),
+                                                          ),
 
-                                                            decoration: BoxDecoration(
-                                                              color:
-                                                                  const Color(
-                                                                    0xFF171727,
-                                                                  ),
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
 
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    28,
-                                                                  ),
-                                                            ),
-
-                                                            child: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-
-                                                              children: [
-                                                                if (selectedAvatar !=
-                                                                    null)
-                                                                  Material(
-                                                                    color: Colors
-                                                                        .transparent,
-
-                                                                    child: InkWell(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            18,
-                                                                          ),
-
-                                                                      splashColor:
-                                                                          const Color(
-                                                                            0xFF5B55A3,
-                                                                          ).withOpacity(
-                                                                            0.25,
-                                                                          ),
-
-                                                                      highlightColor:
-                                                                          const Color(
-                                                                            0xFF5B55A3,
-                                                                          ).withOpacity(
-                                                                            0.12,
-                                                                          ),
-
-                                                                      onTap: () {
-                                                                        Navigator.pop(
-                                                                          context,
-                                                                        );
-
-                                                                        showDialog(
-                                                                          context:
-                                                                              context,
-
-                                                                          builder: (_) {
-                                                                            return Dialog(
-                                                                              backgroundColor: Colors.transparent,
-
-                                                                              child: ClipRRect(
-                                                                                borderRadius: BorderRadius.circular(
-                                                                                  24,
-                                                                                ),
-
-                                                                                child: Image.memory(
-                                                                                  selectedAvatar!,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                        );
-                                                                      },
-
-                                                                      child: const ListTile(
-                                                                        leading: Icon(
-                                                                          Icons
-                                                                              .image,
-                                                                          color:
-                                                                              Colors.white,
-                                                                        ),
-
-                                                                        title: Text(
-                                                                          'See Photo',
-
-                                                                          style: TextStyle(
-                                                                            color:
-                                                                                Colors.white,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-
+                                                            children: [
+                                                              /// SEE PHOTO
+                                                              if (selectedAvatar !=
+                                                                  null)
                                                                 Material(
                                                                   color: Colors
                                                                       .transparent,
@@ -374,55 +246,45 @@ final messDescription =
                                                                           18,
                                                                         ),
 
-                                                                    splashColor:
-                                                                        const Color(
-                                                                          0xFF5B55A3,
-                                                                        ).withOpacity(
-                                                                          0.25,
-                                                                        ),
-
-                                                                    highlightColor:
-                                                                        const Color(
-                                                                          0xFF5B55A3,
-                                                                        ).withOpacity(
-                                                                          0.12,
-                                                                        ),
-
-                                                                    onTap: () async {
+                                                                    onTap: () {
                                                                       Navigator.pop(
                                                                         context,
                                                                       );
 
-                                                                      final picker =
-                                                                          ImagePicker();
+                                                                      showDialog(
+                                                                        context:
+                                                                            context,
 
-                                                                      final image = await picker.pickImage(
-                                                                        source:
-                                                                            ImageSource.gallery,
+                                                                        builder: (_) {
+                                                                          return Dialog(
+                                                                            backgroundColor:
+                                                                                Colors.transparent,
+
+                                                                            child: ClipRRect(
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                24,
+                                                                              ),
+
+                                                                              child: Image.memory(
+                                                                                selectedAvatar!,
+                                                                                fit: BoxFit.cover,
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
                                                                       );
-
-                                                                      if (image !=
-                                                                          null) {
-                                                                        final bytes =
-                                                                            await image.readAsBytes();
-
-                                                                        setStateDialog(() {
-                                                                          selectedAvatar =
-                                                                              bytes;
-                                                                        });
-                                                                      }
                                                                     },
 
                                                                     child: const ListTile(
                                                                       leading: Icon(
                                                                         Icons
-                                                                            .photo_library,
+                                                                            .image,
                                                                         color: Colors
                                                                             .white,
                                                                       ),
 
                                                                       title: Text(
-                                                                        'Choose Photo',
+                                                                        'See Photo',
 
                                                                         style: TextStyle(
                                                                           color:
@@ -433,256 +295,333 @@ final messDescription =
                                                                   ),
                                                                 ),
 
-                                                                if (selectedAvatar !=
-                                                                    null)
-                                                                  Material(
-                                                                    color: Colors
-                                                                        .transparent,
+                                                              /// CHOOSE / UPDATE PHOTO
+                                                              Material(
+                                                                color: Colors
+                                                                    .transparent,
 
-                                                                    child: InkWell(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            18,
-                                                                          ),
+                                                                child: InkWell(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        18,
+                                                                      ),
 
-                                                                      splashColor: Colors
-                                                                          .red
-                                                                          .withOpacity(
-                                                                            0.25,
-                                                                          ),
+                                                                  onTap: () async {
+                                                                    Navigator.pop(
+                                                                      context,
+                                                                    );
 
-                                                                      highlightColor: Colors
-                                                                          .red
-                                                                          .withOpacity(
-                                                                            0.12,
-                                                                          ),
+                                                                    final picker =
+                                                                        ImagePicker();
 
-                                                                      onTap: () {
-                                                                        Navigator.pop(
-                                                                          context,
+                                                                    final image =
+                                                                        await picker.pickImage(
+                                                                          source:
+                                                                              ImageSource.gallery,
                                                                         );
 
-                                                                        setStateDialog(() {
-                                                                          selectedAvatar =
-                                                                              null;
-                                                                          ref
-                                                                              .read(
-                                                                                messControllerProvider.notifier,
-                                                                              )
-                                                                              .updateMessProfile(
-                                                                                name: nameController.text,
-                                                                                description: descriptionController.text,
-                                                                                removeAvatar: true,
-                                                                              );
-                                                                        });
-                                                                      },
+                                                                    if (image !=
+                                                                        null) {
+                                                                      final bytes =
+                                                                          await image
+                                                                              .readAsBytes();
 
-                                                                      child: const ListTile(
-                                                                        leading: Icon(
-                                                                          Icons
-                                                                              .delete,
-                                                                          color:
-                                                                              Colors.red,
+                                                                      setStateDialog(() {
+                                                                        selectedAvatar =
+                                                                            bytes;
+                                                                        avatarRemoved =
+                                                                            false;
+                                                                      });
+                                                                    }
+                                                                  },
+
+                                                                  child: ListTile(
+                                                                    leading: const Icon(
+                                                                      Icons
+                                                                          .photo_library,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+
+                                                                    title: Text(
+                                                                      selectedAvatar ==
+                                                                              null
+                                                                          ? 'Choose Photo'
+                                                                          : 'Update Photo',
+
+                                                                      style: const TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+
+                                                              /// REMOVE PHOTO
+                                                              if (selectedAvatar !=
+                                                                  null)
+                                                                Material(
+                                                                  color: Colors
+                                                                      .transparent,
+
+                                                                  child: InkWell(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          18,
                                                                         ),
 
-                                                                        title: Text(
-                                                                          'Remove Photo',
+                                                                    onTap: () {
+                                                                      /// CLOSE ONLY BOTTOM SHEET
+                                                                      Navigator.of(
+                                                                        context,
+                                                                      ).pop();
 
-                                                                          style: TextStyle(
-                                                                            color:
-                                                                                Colors.red,
-                                                                          ),
+                                                                      /// ONLY UPDATE DIALOG STATE
+                                                                      setStateDialog(() {
+                                                                        selectedAvatar =
+                                                                            null;
+                                                                        avatarRemoved =
+                                                                            true;
+                                                                      });
+                                                                    },
+
+                                                                    child: const ListTile(
+                                                                      leading: Icon(
+                                                                        Icons
+                                                                            .delete,
+                                                                        color: Colors
+                                                                            .red,
+                                                                      ),
+
+                                                                      title: Text(
+                                                                        'Remove Photo',
+
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.red,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                              ],
-                                                            ),
+                                                                ),
+                                                            ],
                                                           ),
                                                         ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
 
-                                                child: CircleAvatar(
-                                                  radius: 45,
+                                              child: CircleAvatar(
+                                                radius: 45,
 
-                                                  backgroundColor: const Color(
-                                                    0xFF5B55A3,
-                                                  ),
-
-                                                  backgroundImage:
-                                                      selectedAvatar != null
-                                                      ? MemoryImage(
-                                                          selectedAvatar!,
-                                                        )
-                                                      : null,
-
-                                                  child: selectedAvatar == null
-                                                      ? const Icon(
-                                                          Icons.camera_alt,
-                                                          color: Colors.white,
-                                                          size: 30,
-                                                        )
-                                                      : null,
-                                                ),
-                                              ),
-
-                                              const SizedBox(height: 24),
-
-                                              TextField(
-                                                controller: nameController,
-
-                                                style: const TextStyle(
-                                                  color: Colors.white,
+                                                backgroundColor: const Color(
+                                                  0xFF5B55A3,
                                                 ),
 
-                                                decoration: InputDecoration(
-                                                  labelText: 'Mess Name',
+                                                backgroundImage:
+                                                    selectedAvatar != null
+                                                    ? MemoryImage(
+                                                        selectedAvatar!,
+                                                      )
+                                                    : null,
 
-                                                  labelStyle: TextStyle(
-                                                    color: Colors.grey.shade400,
-                                                  ),
-                                                ),
-                                              ),
-
-                                              const SizedBox(height: 20),
-
-                                              TextField(
-                                                controller:
-                                                    descriptionController,
-
-                                                maxLines: 3,
-
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                ),
-
-                                                decoration: InputDecoration(
-                                                  labelText: 'Description',
-
-                                                  labelStyle: TextStyle(
-                                                    color: Colors.grey.shade400,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-
-                                            child: const Text('Cancel'),
-                                          ),
-
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(
-                                                0xFF5B55A3,
-                                              ),
-
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(14),
+                                                child: selectedAvatar == null
+                                                    ? const Icon(
+                                                        Icons.camera_alt,
+                                                        color: Colors.white,
+                                                        size: 30,
+                                                      )
+                                                    : null,
                                               ),
                                             ),
 
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                    messControllerProvider
-                                                        .notifier,
-                                                  )
-                                                  .updateMessProfile(
-                                                    name: nameController.text,
+                                            const SizedBox(height: 24),
 
-                                                    description:
-                                                        descriptionController
-                                                            .text,
+                                            /// NAME FIELD
+                                            TextField(
+                                              controller: nameController,
 
-                                                    avatarBytes: selectedAvatar,
-                                                  );
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
 
-                                              Navigator.pop(context);
-                                            },
+                                              decoration: InputDecoration(
+                                                labelText: 'Mess Name',
 
-                                            child: const Text('Save'),
+                                                labelStyle: TextStyle(
+                                                  color: Colors.grey.shade400,
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 20),
+
+                                            /// DESCRIPTION FIELD
+                                            TextField(
+                                              controller: descriptionController,
+
+                                              maxLines: 3,
+
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+
+                                              decoration: InputDecoration(
+                                                labelText: 'Description',
+
+                                                labelStyle: TextStyle(
+                                                  color: Colors.grey.shade400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      actions: [
+                                        /// CANCEL
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+
+                                          child: const Text('Cancel'),
+                                        ),
+
+                                        /// SAVE
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(
+                                              0xFF5B55A3,
+                                            ),
+
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                            ),
                                           ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
 
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF5B55A3),
+                                          onPressed: () async {
+                                            await ref
+                                                .read(
+                                                  messControllerProvider
+                                                      .notifier,
+                                                )
+                                                .updateMessProfile(
+                                                  name: nameController.text,
 
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 14,
-                              ),
+                                                  description:
+                                                      descriptionController
+                                                          .text,
+
+                                                  avatarBytes: selectedAvatar,
+
+                                                  removeAvatar: avatarRemoved,
+                                                );
+
+                                            if (context.mounted) {
+                                              Navigator.pop(context);
+                                            }
+                                          },
+
+                                          child: const Text('Save'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF5B55A3),
+
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
                             ),
 
-                            icon: const Icon(Icons.edit),
-
-                            label: const Text('Edit Profile'),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
-                        ],
+
+                          icon: const Icon(Icons.edit),
+
+                          label: const Text('Edit Profile'),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  /// ALL 8 CARDS
+                  GridView.count(
+                    crossAxisCount: 4,
+
+                    shrinkWrap: true,
+
+                    physics: const NeverScrollableScrollPhysics(),
+
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+
+                    childAspectRatio: 0.95,
+
+                    children: const [
+                      _QuickActionCard(
+                        title: 'Members',
+                        icon: Icons.group,
+                        value: '12',
                       ),
-                    ),
+
+                      _QuickActionCard(
+                        title: 'Today Meals',
+                        icon: Icons.restaurant,
+                        value: '26',
+                      ),
+
+                      _QuickActionCard(
+                        title: 'Balance',
+                        icon: Icons.account_balance_wallet,
+                        value: '৳ 12,500',
+                      ),
+
+                      _QuickActionCard(
+                        title: 'Expenses',
+                        icon: Icons.bar_chart,
+                        value: '৳ 4,200',
+                      ),
+
+                      _QuickActionCard(
+                        title: 'Add Meal',
+                        icon: Icons.restaurant_menu,
+                      ),
+
+                      _QuickActionCard(
+                        title: 'Add Expense',
+                        icon: Icons.payments,
+                      ),
+
+                      _QuickActionCard(title: 'Open Chat', icon: Icons.chat),
+
+                      _QuickActionCard(
+                        title: 'Invite Member',
+                        icon: Icons.person_add,
+                      ),
+                    ],
                   ),
                 ],
               ),
 
               const SizedBox(height: 30),
 
-              // QUICK ACTIONS
-              Row(
-                children: const [
-                  Expanded(
-                    child: _QuickActionCard(
-                      title: 'Add Meal',
-                      icon: Icons.restaurant_menu,
-                    ),
-                  ),
-
-                  SizedBox(width: 20),
-
-                  Expanded(
-                    child: _QuickActionCard(
-                      title: 'Add Expense',
-                      icon: Icons.payments,
-                    ),
-                  ),
-
-                  SizedBox(width: 20),
-
-                  Expanded(
-                    child: _QuickActionCard(
-                      title: 'Open Chat',
-                      icon: Icons.chat,
-                    ),
-                  ),
-
-                  SizedBox(width: 20),
-
-                  Expanded(
-                    child: _QuickActionCard(
-                      title: 'Invite Member',
-                      icon: Icons.person_add,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 30),
+              //const SizedBox(height: 30),
 
               // MEMBERS
               Container(
@@ -788,34 +727,68 @@ class _StatCard extends StatelessWidget {
 class _QuickActionCard extends StatelessWidget {
   final String title;
   final IconData icon;
+  final String? value;
 
-  const _QuickActionCard({required this.title, required this.icon});
+  const _QuickActionCard({required this.title, required this.icon, this.value});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 105,
-
       decoration: BoxDecoration(
         color: const Color(0xFF171727),
-
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(22),
       ),
 
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
 
-        children: [
-          Icon(icon, size: 32, color: const Color(0xFF8E87FD)),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
 
-          const SizedBox(height: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
 
-          Text(
-            title,
+            children: [
+              Icon(icon, color: const Color(0xFF8B80F8), size: 24),
 
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+              const SizedBox(height: 8),
+
+              if (value != null)
+                Text(
+                  value!,
+
+                  textAlign: TextAlign.center,
+
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+              if (value != null) const SizedBox(height: 4),
+
+              SizedBox(
+                width: 80,
+
+                child: Text(
+                  title,
+
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+
+                  textAlign: TextAlign.center,
+
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -9,60 +9,39 @@ import '../data/mess_repository.dart';
 import '../domain/mess.dart';
 import 'mess_state.dart';
 
-final messRepositoryProvider =
-    Provider<MessRepository>((ref) {
+final messRepositoryProvider = Provider<MessRepository>((ref) {
   return InMemoryMessRepository();
 });
 
-final messControllerProvider =
-    StateNotifierProvider<
-      MessController,
-      MessState
-    >((ref) {
-      final repository =
-          ref.watch(
-            messRepositoryProvider,
-          );
+final messControllerProvider = StateNotifierProvider<MessController, MessState>(
+  (ref) {
+    final repository = ref.watch(messRepositoryProvider);
 
-      return MessController(
-        ref,
-        repository,
-      );
-    });
+    return MessController(ref, repository);
+  },
+);
 
-class MessController
-    extends StateNotifier<MessState> {
+class MessController extends StateNotifier<MessState> {
   final Ref ref;
   final MessRepository _repository;
 
-  final String _userId =
-      'mock-user-id';
+  final String _userId = 'mock-user-id';
 
   Mess? _currentMess;
 
-  MessController(
-    this.ref,
-    this._repository,
-  ) : super(
-         const MessState.loading(),
-       ) {
+  MessController(this.ref, this._repository)
+    : super(const MessState.loading()) {
     loadUserMess();
   }
 
   // LOAD MESS
   Future<void> loadUserMess() async {
     try {
-      final savedName =
-          await LocalStorageService
-              .getMessName();
+      final savedName = await LocalStorageService.getMessName();
 
-      final savedDescription =
-          await LocalStorageService
-              .getDescription();
+      final savedDescription = await LocalStorageService.getDescription();
 
-      final savedAvatar =
-          await LocalStorageService
-              .getAvatar();
+      final savedAvatar = await LocalStorageService.getAvatar();
 
       // IF SAVED DATA EXISTS
       // RESTORE DIRECTLY
@@ -72,8 +51,7 @@ class MessController
 
           name: savedName,
 
-          createdAt:
-              DateTime.now(),
+          createdAt: DateTime.now(),
 
           inviteCode: 'LOCAL01',
 
@@ -81,58 +59,40 @@ class MessController
 
           memberIds: [_userId],
 
-          description:
-              savedDescription,
+          description: savedDescription,
 
-          avatarBytes:
-              savedAvatar,
+          avatarBytes: savedAvatar,
         );
 
-        state = MessState.loaded(
-          mess: _currentMess!,
-        );
+        state = MessState.loaded(mess: _currentMess!);
 
         return;
       }
 
       // NO SAVED DATA
-      final mess =
-          _repository.getUserMess(
-        _userId,
-      );
+      final mess = _repository.getUserMess(_userId);
 
       if (mess != null) {
         _currentMess = mess;
 
-        state = MessState.loaded(
-          mess: mess,
-        );
+        state = MessState.loaded(mess: mess);
       } else {
-        state =
-            const MessState.notInMess();
+        state = const MessState.notInMess();
       }
     } catch (e) {
-      state = MessState.error(
-        message:
-            'Failed to load mess: ${e.toString()}',
-      );
+      state = MessState.error(message: 'Failed to load mess: ${e.toString()}');
     }
   }
 
   // CREATE MESS
-  Future<void> createMess(
-    String messName,
-  ) async {
+  Future<void> createMess(String messName) async {
     state = const MessState.loading();
 
     try {
-      final inviteCode =
-          _generateInviteCode();
+      final inviteCode = _generateInviteCode();
 
       final newMess = Mess(
-        id: DateTime.now()
-            .millisecondsSinceEpoch
-            .toString(),
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
 
         name: messName,
 
@@ -148,36 +108,22 @@ class MessController
       _currentMess = newMess;
 
       // SAVE LOCALLY
-      await LocalStorageService
-          .saveMessName(
-        messName,
-      );
+      await LocalStorageService.saveMessName(messName);
 
-      await LocalStorageService
-          .saveDescription('');
+      await LocalStorageService.saveDescription('');
 
-      ref
-          .read(
-            authControllerProvider
-                .notifier,
-          )
-          .completeOnboarding();
+      ref.read(authControllerProvider.notifier).completeOnboarding();
 
-      state = MessState.loaded(
-        mess: newMess,
-      );
+      state = MessState.loaded(mess: newMess);
     } catch (e) {
       state = MessState.error(
-        message:
-            'Failed to create mess: ${e.toString()}',
+        message: 'Failed to create mess: ${e.toString()}',
       );
     }
   }
 
   // JOIN MESS
-  Future<void> joinMess(
-    String inviteCode,
-  ) async {
+  Future<void> joinMess(String inviteCode) async {
     state = const MessState.loading();
 
     try {
@@ -197,19 +143,11 @@ class MessController
 
       _currentMess = joinedMess;
 
-      await LocalStorageService
-          .saveMessName(
-        joinedMess.name,
-      );
+      await LocalStorageService.saveMessName(joinedMess.name);
 
-      state = MessState.loaded(
-        mess: joinedMess,
-      );
+      state = MessState.loaded(mess: joinedMess);
     } catch (e) {
-      state = MessState.error(
-        message:
-            'Failed to join mess: ${e.toString()}',
-      );
+      state = MessState.error(message: 'Failed to join mess: ${e.toString()}');
     }
   }
 
@@ -223,78 +161,59 @@ class MessController
     if (_currentMess == null) {
       _currentMess = Mess(
         id: 'saved-mess',
-
         name: name,
-
         createdAt: DateTime.now(),
-
         inviteCode: 'LOCAL01',
-
         adminId: _userId,
-
         memberIds: [_userId],
       );
     }
 
-    _currentMess = _currentMess!.copyWith(
-      name: name.trim(),
-
-      description:
-          description?.trim(),
-
-      avatarBytes:
-          removeAvatar
-              ? null
-              : avatarBytes,
-    );
-
-    // SAVE LOCALLY
-    await LocalStorageService
-        .saveMessName(
-      _currentMess!.name,
-    );
-
-    await LocalStorageService
-        .saveDescription(
-      _currentMess!.description ?? '',
-    );
-
+    /// REMOVE PHOTO
     if (removeAvatar) {
-      await LocalStorageService
-          .removeAvatar();
-    } else if (avatarBytes != null) {
-      await LocalStorageService
-          .saveAvatar(
-        avatarBytes,
+      _currentMess = _currentMess!.copyWith(
+        name: name.trim(),
+
+        description: description?.trim(),
+
+        avatarBytes: null,
+
+        removeAvatar: true,
       );
+
+      await LocalStorageService.removeAvatar();
+    } else {
+      /// UPDATE / KEEP PHOTO
+      _currentMess = _currentMess!.copyWith(
+        name: name.trim(),
+
+        description: description?.trim(),
+
+        avatarBytes: avatarBytes ?? _currentMess!.avatarBytes,
+      );
+
+      if (avatarBytes != null) {
+        await LocalStorageService.saveAvatar(avatarBytes);
+      }
     }
 
-    state = MessState.loaded(
-      mess: _currentMess!,
-    );
+    /// SAVE OTHER DATA
+    await LocalStorageService.saveMessName(_currentMess!.name);
+
+    await LocalStorageService.saveDescription(_currentMess!.description ?? '');
+
+    /// REFRESH STATE
+    state = MessState.loaded(mess: _currentMess!);
   }
+}
 
-  // LEAVE MESS
-  Future<void> leaveMess() async {
-    _currentMess = null;
+String _generateInviteCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-    state =
-        const MessState.notInMess();
-  }
+  final random = Random();
 
-  // INVITE CODE
-  String _generateInviteCode() {
-    const chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-    final random = Random();
-
-    return List.generate(
-      6,
-      (index) => chars[
-          random.nextInt(
-            chars.length,
-          )],
-    ).join();
-  }
+  return List.generate(
+    6,
+    (index) => chars[random.nextInt(chars.length)],
+  ).join();
 }
