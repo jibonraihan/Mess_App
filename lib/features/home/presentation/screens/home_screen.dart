@@ -694,6 +694,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
 
                       calendarStyle: CalendarStyle(
+                        cellMargin: const EdgeInsets.all(6),
+
+                        cellPadding: const EdgeInsets.all(0),
                         defaultTextStyle: const TextStyle(color: Colors.white),
 
                         weekendTextStyle: const TextStyle(color: Colors.white),
@@ -730,9 +733,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final memberName = bazaarDuty[normalizedDay];
 
                           return Container(
-                            width: 100,
-                            height: 52,
-                            margin: const EdgeInsets.all(3),
+                            width: double.infinity,
+                            height: 56,
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 2,
+                              vertical: 4,
+                            ),
 
                             decoration: BoxDecoration(
                               color: const Color(0xFF5B55A3),
