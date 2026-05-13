@@ -292,7 +292,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         crossAxisSpacing: 18,
                         mainAxisSpacing: 18,
 
-                        childAspectRatio: 1.25,
+                        childAspectRatio: 1.05,
 
                         children: [
                           _expenseCard(
@@ -431,7 +431,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         crossAxisSpacing: 18,
                         mainAxisSpacing: 18,
 
-                        childAspectRatio: 1.25,
+                        childAspectRatio: 1.05,
 
                         children: [
                           _mealStatCard(
@@ -782,7 +782,7 @@ Widget _expenseCard({
           alignment: Alignment.topLeft,
 
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
 
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
@@ -790,14 +790,14 @@ Widget _expenseCard({
               borderRadius: BorderRadius.circular(16),
             ),
 
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
         ),
 
         Expanded(
           child: Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
 
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -823,32 +823,39 @@ Widget _expenseCard({
                 ],
               ),
 
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
 
-                children: [
-                  Text(
-                    amount,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
 
-                    style: const TextStyle(
-                      color: Colors.white,
+                  children: [
+                    Text(
+                      amount,
 
-                      fontSize: 28,
+                      style: const TextStyle(
+                        color: Colors.white,
 
-                      fontWeight: FontWeight.bold,
+                        fontSize: 22,
+
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 6),
 
-                  Text(
-                    title,
+                    Text(
+                      title,
 
-                    textAlign: TextAlign.center,
+                      textAlign: TextAlign.center,
 
-                    style: const TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                ],
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -945,7 +952,7 @@ Widget _mealStatCard({
           alignment: Alignment.topLeft,
 
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
 
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
@@ -953,14 +960,14 @@ Widget _mealStatCard({
               borderRadius: BorderRadius.circular(16),
             ),
 
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
         ),
 
         Expanded(
           child: Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
 
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -986,32 +993,39 @@ Widget _mealStatCard({
                 ],
               ),
 
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
 
-                children: [
-                  Text(
-                    value,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
 
-                    style: const TextStyle(
-                      color: Colors.white,
+                  children: [
+                    Text(
+                      value,
 
-                      fontSize: 28,
+                      style: const TextStyle(
+                        color: Colors.white,
 
-                      fontWeight: FontWeight.bold,
+                        fontSize: 22,
+
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 6),
 
-                  Text(
-                    title,
+                    Text(
+                      title,
 
-                    textAlign: TextAlign.center,
+                      textAlign: TextAlign.center,
 
-                    style: const TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                ],
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
