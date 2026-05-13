@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:mess_app/features/mess/application/mess_controller.dart';
 import 'package:mess_app/features/mess/application/mess_state.dart';
-import 'package:mess_app/features/mess/domain/mess.dart';
 import 'package:go_router/go_router.dart';
 
 class CreateMessScreen extends ConsumerStatefulWidget {

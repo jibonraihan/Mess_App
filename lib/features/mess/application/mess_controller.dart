@@ -158,8 +158,7 @@ class MessController extends StateNotifier<MessState> {
     Uint8List? avatarBytes,
     bool removeAvatar = false,
   }) async {
-    if (_currentMess == null) {
-      _currentMess = Mess(
+    _currentMess ??= Mess(
         id: 'saved-mess',
         name: name,
         createdAt: DateTime.now(),
@@ -167,7 +166,6 @@ class MessController extends StateNotifier<MessState> {
         adminId: _userId,
         memberIds: [_userId],
       );
-    }
 
     /// REMOVE PHOTO
     if (removeAvatar) {

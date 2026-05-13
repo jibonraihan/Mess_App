@@ -4,11 +4,68 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../mess/application/mess_controller.dart';
 
-class AdminDashboardScreen extends ConsumerWidget {
+class MessMember {
+  final String name;
+  final String phone;
+  final String role;
+  final Color color;
+
+  const MessMember({
+    required this.name,
+    required this.phone,
+    required this.role,
+    required this.color,
+  });
+}
+
+class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminDashboardScreen> createState() =>
+      _AdminDashboardScreenState();
+}
+
+class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
+  final ScrollController _memberScrollController = ScrollController();
+  final List<MessMember> members = [
+    const MessMember(
+      name: 'Raihan',
+      phone: '01843118076',
+      role: 'Admin',
+      color: Color(0xFF5B55A3),
+    ),
+
+    const MessMember(
+      name: 'Tanvir',
+      phone: '01512345678',
+      role: 'Member',
+      color: Colors.blue,
+    ),
+
+    const MessMember(
+      name: 'Kanon',
+      phone: '01798765432',
+      role: 'Member',
+      color: Colors.green,
+    ),
+
+    const MessMember(
+      name: 'Washim',
+      phone: '01611223344',
+      role: 'Moderator',
+      color: Colors.orange,
+    ),
+  ];
+
+  @override
+  void dispose() {
+    _memberScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final messState = ref.watch(messControllerProvider);
 
     return Scaffold(
@@ -187,87 +244,228 @@ class AdminDashboardScreen extends ConsumerWidget {
                       ),
 
                       const SizedBox(height: 20),
+                      const SizedBox(height: 10),
 
-                      SizedBox(
-                        width: double.infinity,
-
-                        child: FilledButton.icon(
-                          onPressed: () {},
-
-                          style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFF5B55A3),
-
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-
-                          icon: const Icon(Icons.refresh),
-
-                          label: const Text('Regenerate Invite Code'),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-
-                      const Text(
-                        'Mess Members',
-
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
+                      /// COMBINED MEMBER SECTION
                       Container(
-                        width: double.infinity,
-
-                        padding: const EdgeInsets.all(24),
-
                         decoration: BoxDecoration(
-                          color: const Color(0xFF171727),
+                          color: const Color(0xFF141425),
 
-                          borderRadius: BorderRadius.circular(28),
+                          borderRadius: BorderRadius.circular(34),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.32),
+                              blurRadius: 45,
+                              offset: const Offset(0, 14),
+                            ),
+                          ],
                         ),
 
                         child: Column(
                           children: [
-                            _memberTile(
-                              name: 'Raihan',
-                              role: 'Admin',
-                              color: const Color(0xFF5B55A3),
+                            /// TAB BAR
+                            Container(
+                              padding: const EdgeInsets.all(8),
+
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF111120),
+
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(34),
+                                  topRight: Radius.circular(34),
+                                ),
+
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.40),
+                                    blurRadius: 35,
+                                    offset: const Offset(0, 12),
+                                  ),
+                                ],
+                              ),
+
+                              child: Row(
+                                children: [
+                                  /// ACTIVE MEMBERS TAB
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF171727),
+
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(22),
+                                          topRight: Radius.circular(22),
+                                        ),
+                                      ),
+
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+
+                                        mainAxisSize: MainAxisSize.min,
+
+                                        children: [
+                                          const Text(
+                                            'Members',
+
+                                            overflow: TextOverflow.ellipsis,
+
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                          const SizedBox(height: 1),
+
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.people,
+                                                color: Colors.white54,
+                                                size: 11,
+                                              ),
+
+                                              const SizedBox(width: 5),
+
+                                              Text(
+                                                '${members.length}',
+
+                                                style: const TextStyle(
+                                                  color: Colors.white54,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 8),
+
+                                  /// ADD MEMBER TAB
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showAddMemberDialog(context);
+                                      },
+
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 18,
+                                          vertical: 18,
+                                        ),
+
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF5B55A3),
+
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+
+                                          children: [
+                                            Icon(
+                                              Icons.add,
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),
+
+                                            SizedBox(width: 8),
+
+                                            Flexible(
+                                              child: Text(
+                                                'Add Member',
+
+                                                overflow: TextOverflow.ellipsis,
+
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
 
-                            const SizedBox(height: 16),
+                            /// MEMBER LIST
+                            Container(
+                              height: 320,
 
-                            _memberTile(
-                              name: 'Tanvir',
-                              role: 'Member',
-                              color: Colors.blue,
-                            ),
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                12,
+                                20,
+                                20,
+                              ),
 
-                            const SizedBox(height: 16),
+                              child: RawScrollbar(
+                                controller: _memberScrollController,
 
-                            _memberTile(
-                              name: 'Kanon',
-                              role: 'Member',
-                              color: Colors.green,
-                            ),
+                                thumbColor: const Color(0xFF5B55A3),
 
-                            const SizedBox(height: 16),
+                                trackColor: Colors.white10,
 
-                            _memberTile(
-                              name: 'Washim',
-                              role: 'Moderator',
-                              color: Colors.orange,
+                                radius: const Radius.circular(20),
+
+                                thickness: 3,
+
+                                thumbVisibility: true,
+
+                                trackVisibility: true,
+
+                                child: ListView.separated(
+                                  controller: _memberScrollController,
+
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+
+                                  itemCount: members.length,
+
+                                  separatorBuilder: (_, _) =>
+                                      const SizedBox(height: 16),
+
+                                  itemBuilder: (context, index) {
+                                    final member = members[index];
+
+                                    return _memberTile(
+                                      name: member.name,
+
+                                      phone: member.phone,
+
+                                      role: member.role,
+
+                                      color: member.color,
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 32),
 
                       const Text(
@@ -655,31 +853,32 @@ class AdminDashboardScreen extends ConsumerWidget {
 
 Widget _memberTile({
   required String name,
+  required String phone,
   required String role,
   required Color color,
 }) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
 
     decoration: BoxDecoration(
       color: const Color(0xFF111120),
 
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(24),
     ),
 
     child: Row(
       children: [
         CircleAvatar(
-          radius: 28,
+          radius: 24,
 
           backgroundColor: color,
 
           child: Text(
-            name.substring(0, 1).toUpperCase(),
+            name.substring(0, 1),
 
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -692,39 +891,55 @@ Widget _memberTile({
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              Text(
-                name,
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      name,
 
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                      overflow: TextOverflow.ellipsis,
+
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.15),
+
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+
+                    child: Text(
+                      role,
+
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 6),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+              Text(
+                phone,
 
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.18),
-
-                  borderRadius: BorderRadius.circular(30),
-                ),
-
-                child: Text(
-                  role,
-
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
               ),
             ],
           ),
@@ -743,6 +958,8 @@ Widget _memberTile({
 
               child: Text('Promote to Admin'),
             ),
+
+            const PopupMenuItem(value: 'copy', child: Text('Copy Number')),
 
             const PopupMenuItem(value: 'remove', child: Text('Remove Member')),
           ],
@@ -1155,5 +1372,119 @@ Widget _settingsTile({
         trailing,
       ],
     ),
+  );
+}
+
+void _showAddMemberDialog(BuildContext context) {
+  final nameController = TextEditingController();
+
+  final phoneController = TextEditingController();
+
+  String selectedRole = 'Member';
+
+  showDialog(
+    context: context,
+
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setStateDialog) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF171727),
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+
+            title: const Text(
+              'Add Member',
+
+              style: TextStyle(color: Colors.white),
+            ),
+
+            content: SizedBox(
+              width: 420,
+
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+
+                children: [
+                  TextField(
+                    controller: nameController,
+
+                    style: const TextStyle(color: Colors.white),
+
+                    decoration: const InputDecoration(labelText: 'Name'),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  TextField(
+                    controller: phoneController,
+
+                    keyboardType: TextInputType.phone,
+
+                    style: const TextStyle(color: Colors.white),
+
+                    decoration: const InputDecoration(
+                      labelText: 'Phone Number',
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedRole,
+
+                    dropdownColor: const Color(0xFF171727),
+
+                    items: const [
+                      DropdownMenuItem(value: 'Member', child: Text('Member')),
+
+                      DropdownMenuItem(
+                        value: 'Moderator',
+                        child: Text('Moderator'),
+                      ),
+
+                      DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+                    ],
+
+                    onChanged: (value) {
+                      setStateDialog(() {
+                        selectedRole = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+
+                child: const Text('Cancel'),
+              ),
+
+              FilledButton(
+                onPressed: () {
+                  final generatedPassword = DateTime.now()
+                      .millisecondsSinceEpoch
+                      .toString()
+                      .substring(7);
+
+                  debugPrint('Generated Password: $generatedPassword');
+
+                  Navigator.pop(context);
+                },
+
+                child: const Text('Add Member'),
+              ),
+            ],
+          );
+        },
+      );
+    },
   );
 }
