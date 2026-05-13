@@ -1,27 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../core/widgets/app_shell.dart';
-
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
-
 import '../../features/auth/presentation/screens/choose_mess_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
-
 import '../../features/chat/presentation/screens/group_chat_screen.dart';
-
 import '../../features/expenses/presentation/screens/expenses_screen.dart';
-
 import '../../features/home/presentation/screens/home_screen.dart';
-
 import '../../features/meals/presentation/screens/meal_details_screen.dart';
 import '../../features/meals/presentation/screens/meal_history_screen.dart';
 import '../../features/meals/presentation/screens/meal_management_screen.dart';
-
 import '../../features/mess/presentation/screens/create_mess_screen.dart';
 import '../../features/mess/presentation/screens/join_mess_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -64,6 +58,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/mess/join',
         builder: (context, state) => const JoinMessScreen(),
+      ),
+
+      GoRoute(
+        path: '/profile',
+
+        pageBuilder: (context, state) =>
+            NoTransitionPage(child: AppShell(child: const ProfileScreen())),
+      ),
+
+      GoRoute(
+        path: '/settings',
+
+        pageBuilder: (context, state) =>
+            NoTransitionPage(child: AppShell(child: const SettingsScreen())),
       ),
 
       // MAIN APP
