@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../mess/application/mess_controller.dart';
 import '../../../mess/domain/mess.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +16,17 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  DateTime today = DateTime.now();
+
+  final Map<DateTime, String> bazaarDuty = {
+    DateTime.utc(2026, 5, 13): 'Raihan',
+
+    DateTime.utc(2026, 5, 14): 'Sakib',
+
+    DateTime.utc(2026, 5, 15): 'Tanvir',
+
+    DateTime.utc(2026, 5, 16): 'Nabil',
+  };
   @override
   Widget build(BuildContext context) {
     final messState = ref.watch(messControllerProvider);
@@ -621,8 +633,227 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const SizedBox(height: 30),
 
-              //const SizedBox(height: 30),
+              Container(
+                width: double.infinity,
 
+                padding: const EdgeInsets.all(24),
+
+                decoration: BoxDecoration(
+                  color: const Color(0xFF171727),
+
+                  borderRadius: BorderRadius.circular(30),
+                ),
+
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    const Text(
+                      'Bazaar Calendar',
+
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    TableCalendar(
+                      focusedDay: today,
+
+                      firstDay: DateTime.utc(2020),
+                      lastDay: DateTime.utc(2035),
+
+                      calendarFormat: CalendarFormat.month,
+
+                      headerStyle: const HeaderStyle(
+                        titleTextStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+
+                        formatButtonVisible: false,
+
+                        leftChevronIcon: Icon(
+                          Icons.chevron_left,
+                          color: Colors.white,
+                        ),
+
+                        rightChevronIcon: Icon(
+                          Icons.chevron_right,
+                          color: Colors.white,
+                        ),
+                      ),
+
+                      daysOfWeekStyle: const DaysOfWeekStyle(
+                        weekdayStyle: TextStyle(color: Colors.white70),
+                        weekendStyle: TextStyle(color: Colors.white70),
+                      ),
+
+                      calendarStyle: CalendarStyle(
+                        defaultTextStyle: const TextStyle(color: Colors.white),
+
+                        weekendTextStyle: const TextStyle(color: Colors.white),
+
+                        todayDecoration: BoxDecoration(
+                          color: const Color(0xFF5B55A3),
+
+                          borderRadius: BorderRadius.circular(16),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF5B55A3).withOpacity(0.45),
+
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+
+                        todayTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      calendarBuilders: CalendarBuilders(
+                        todayBuilder: (context, day, focusedDay) {
+                          final normalizedDay = DateTime.utc(
+                            day.year,
+                            day.month,
+                            day.day,
+                          );
+
+                          final memberName = bazaarDuty[normalizedDay];
+
+                          return Container(
+                            width: 100,
+                            height: 52,
+                            margin: const EdgeInsets.all(3),
+
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF5B55A3),
+
+                              borderRadius: BorderRadius.circular(20),
+
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(
+                                    255,
+                                    1,
+                                    58,
+                                    92,
+                                  ).withOpacity(0.35),
+
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+                                Text(
+                                  '${day.day}',
+
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+
+                                if (memberName != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+
+                                    child: Text(
+                                      memberName,
+
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                        defaultBuilder: (context, day, focusedDay) {
+                          //final isToday = isSameDay(day, today);
+                          final normalizedDay = DateTime.utc(
+                            day.year,
+                            day.month,
+                            day.day,
+                          );
+
+                          final memberName = bazaarDuty[normalizedDay];
+
+                          return Container(
+                            margin: const EdgeInsets.all(3),
+
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F0F1B),
+
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+                                Text(
+                                  '${day.day}',
+
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                if (memberName != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+
+                                    child: Text(
+                                      memberName,
+
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+
+                                      style: TextStyle(
+                                        color: isSameDay(day, today)
+                                            ? const Color(0xFFFFD66B)
+                                            : const Color(0xFF8B80F8),
+
+                                        fontSize: isSameDay(day, today)
+                                            ? 11
+                                            : 10,
+
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
               // MEMBERS
               Container(
                 width: double.infinity,
