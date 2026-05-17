@@ -53,31 +53,25 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Listen to the state to handle success and error
-    ref.listen<MessState>(
-      messControllerProvider,
-      (previous, next) {
-        next.whenOrNull(
-          loaded: (mess) {
-            context.go('/home');
-            },
-          error: (message) {
-            setState(() {
-              _errorMessage = message;
-            });
-          },
-        );
-      },
-    );
+    ref.listen<MessState>(messControllerProvider, (previous, next) {
+      next.whenOrNull(
+        loaded: (mess) {
+          context.go('/home');
+        },
+        error: (message) {
+          setState(() {
+            _errorMessage = message;
+          });
+        },
+      );
+    });
 
-    final isLoading = ref.watch(messControllerProvider).maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        );
+    final isLoading = ref
+        .watch(messControllerProvider)
+        .maybeWhen(loading: () => true, orElse: () => false);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Mess'),
-      ),
+      appBar: AppBar(title: const Text('Create Mess')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -104,8 +98,12 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
     );
   }
 
-  Widget _buildInputLayout(BuildContext context, bool isLoading,
-      TextTheme textTheme, ColorScheme colorScheme) {
+  Widget _buildInputLayout(
+    BuildContext context,
+    bool isLoading,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       key: const ValueKey('input_layout'),
       mainAxisAlignment: MainAxisAlignment.center,
@@ -121,7 +119,9 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
         const Gap(8),
         Text(
           'Create a name for your mess to get started.',
-          style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
         ),
         const Gap(32),
@@ -129,7 +129,7 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
           controller: _messNameController,
           decoration: InputDecoration(
             labelText: 'Mess Name',
-            hintText: 'e.g., The Hungry Coders',
+            hintText: 'e.g., The Sweet Home',
             errorText: _errorMessage,
             prefixIcon: const Icon(Icons.group_work_outlined),
           ),
@@ -145,7 +145,9 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
             onPressed: _createMess,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text('Create Mess', style: TextStyle(fontSize: 16)),
           ),
@@ -198,7 +200,9 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: code));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Invite code copied to clipboard!')),
+                    const SnackBar(
+                      content: Text('Invite code copied to clipboard!'),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.copy_rounded),
@@ -210,8 +214,8 @@ class _CreateMessScreenState extends ConsumerState<CreateMessScreen> {
         const Gap(48),
         FilledButton(
           onPressed: () {
-              context.go('/home');
-               },
+            context.go('/home');
+          },
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
           ),

@@ -20,6 +20,7 @@ class MealManagementScreen extends ConsumerWidget {
     final controller = ref.read(mealsControllerProvider.notifier);
     final data = state.data;
     final isDesktop = ResponsiveBreakpoints.isDesktop(context);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     if (state.isLoading && data == null) {
       return const Center(child: CircularProgressIndicator());
@@ -82,7 +83,8 @@ class MealManagementScreen extends ConsumerWidget {
               MealStatChip(
                 icon: Icons.percent_rounded,
                 label: 'Attendance rate',
-                value: '${(data.stats.attendanceRate * 100).toStringAsFixed(0)}%',
+                value:
+                    '${(data.stats.attendanceRate * 100).toStringAsFixed(0)}%',
               ),
             ],
           ),
@@ -99,27 +101,32 @@ class MealManagementScreen extends ConsumerWidget {
                     onPressed: controller.load,
                     icon: const Icon(Icons.refresh_rounded),
                   ),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: data.todayMeals.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: isDesktop ? 3 : 1,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: isDesktop ? 1.4 : 2.8,
-              ),
-              itemBuilder: (context, index) {
-                final item = data.todayMeals[index];
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+
+              children: data.todayMeals.map((item) {
+                final screenWidth = MediaQuery.of(context).size.width;
+
+                final cardWidth = isDesktop
+                    ? (screenWidth / 3) - 40
+                    : double.infinity;
+
+                return SizedBox(
+                  width: cardWidth,
+
                   child: MealStatusCard(
-                    key: ValueKey('${item.type}-${item.isActive}-${item.totalCount}'),
+                    key: ValueKey(
+                      '${item.type}-${item.isActive}-${item.totalCount}',
+                    ),
+
                     item: item,
-                    onToggle: (active) => controller.toggleStatus(item.type, active),
+
+                    onToggle: (active) =>
+                        controller.toggleStatus(item.type, active),
                   ),
                 );
-              },
+              }).toList(),
             ),
           ),
           const SizedBox(height: 12),
