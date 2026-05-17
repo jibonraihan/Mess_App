@@ -9,100 +9,87 @@ class ChooseMessScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0B0B16),
 
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isSmallScreen = constraints.maxWidth < 900;
 
-            final isSmallScreen =
-                constraints.maxWidth < 900;
+          final leftSection = Container(
+            width: double.infinity,
 
-            final leftSection = Container(
-              width: double.infinity,
+            color: const Color(0xFF5B55A3),
 
-              color: const Color(0xFF5B55A3),
+            padding: EdgeInsets.only(
+              left: isSmallScreen ? 24 : 40,
+              right: isSmallScreen ? 24 : 40,
+              top: isSmallScreen ? 90 : 60,
+              bottom: isSmallScreen ? 40 : 60,
+            ),
 
-              padding: EdgeInsets.symmetric(
-                horizontal: isSmallScreen ? 24 : 40,
-                vertical: isSmallScreen ? 40 : 60,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
 
-              child: Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Choose Your Mess',
 
-                children: [
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 36 : 52,
 
-                  Text(
-                    'Choose Your Mess',
+                    fontWeight: FontWeight.bold,
 
-                    style: TextStyle(
-                      fontSize:
-                          isSmallScreen ? 36 : 52,
-
-                      fontWeight: FontWeight.bold,
-
-                      color: Colors.white,
-                    ),
+                    color: Colors.white,
                   ),
+                ),
 
-                  const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-                  Text(
-                    'Create a new mess or join an existing one using an invite code.',
+                Text(
+                  'Create a new mess or join an existing one using an invite code.',
 
-                    style: TextStyle(
-                      fontSize:
-                          isSmallScreen ? 18 : 22,
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 18 : 22,
 
-                      color: Colors.white70,
+                    color: Colors.white70,
 
-                      height: 1.5,
-                    ),
+                    height: 1.5,
                   ),
-                ],
-              ),
-            );
+                ),
+              ],
+            ),
+          );
 
-            final rightSection = Center(
-              child: SingleChildScrollView(
-                child: SizedBox(
-                  width:
-                      isSmallScreen
-                          ? double.infinity
-                          : 500,
+          final rightSection = Center(
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: isSmallScreen ? double.infinity : 500,
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.55,
 
                     child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
 
                       children: [
-
                         MouseRegion(
-                          cursor:
-                              SystemMouseCursors.click,
+                          cursor: SystemMouseCursors.click,
 
                           child: GestureDetector(
                             onTap: () {
-                              context.go(
-                                '/mess/create',
-                              );
+                              context.go('/mess/create');
                             },
 
                             child: _OptionCard(
-                              title:
-                                  'Create New Mess',
+                              title: 'Create New Mess',
 
                               subtitle:
                                   'Become admin and generate an invite code.',
 
-                              icon: Icons
-                                  .add_business_rounded,
+                              icon: Icons.add_business_rounded,
                             ),
                           ),
                         ),
@@ -110,25 +97,19 @@ class ChooseMessScreen extends StatelessWidget {
                         const SizedBox(height: 24),
 
                         MouseRegion(
-                          cursor:
-                              SystemMouseCursors.click,
+                          cursor: SystemMouseCursors.click,
 
                           child: GestureDetector(
                             onTap: () {
-                              context.go(
-                                '/mess/join',
-                              );
+                              context.go('/mess/join');
                             },
 
                             child: _OptionCard(
-                              title:
-                                  'Join Existing Mess',
+                              title: 'Join Existing Mess',
 
-                              subtitle:
-                                  'Enter an invite code to join a mess.',
+                              subtitle: 'Enter an invite code to join a mess.',
 
-                              icon: Icons
-                                  .group_add_rounded,
+                              icon: Icons.group_add_rounded,
                             ),
                           ),
                         ),
@@ -137,41 +118,21 @@ class ChooseMessScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            );
+            ),
+          );
 
-            return isSmallScreen
+          return isSmallScreen
+              ? SingleChildScrollView(
+                  child: Column(children: [leftSection, rightSection]),
+                )
+              : Row(
+                  children: [
+                    Expanded(flex: 2, child: leftSection),
 
-                ? Column(
-                    children: [
-
-                      Expanded(
-                        flex: 2,
-                        child: leftSection,
-                      ),
-
-                      Expanded(
-                        flex: 3,
-                        child: rightSection,
-                      ),
-                    ],
-                  )
-
-                : Row(
-                    children: [
-
-                      Expanded(
-                        flex: 2,
-                        child: leftSection,
-                      ),
-
-                      Expanded(
-                        flex: 4,
-                        child: rightSection,
-                      ),
-                    ],
-                  );
-          },
-        ),
+                    Expanded(flex: 4, child: rightSection),
+                  ],
+                );
+        },
       ),
     );
   }
@@ -200,9 +161,7 @@ class _OptionCard extends StatelessWidget {
 
         color: const Color(0xFF171727),
 
-        border: Border.all(
-          color: Colors.white.withOpacity(0.06),
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.06)),
 
         boxShadow: [
           BoxShadow(
@@ -217,29 +176,21 @@ class _OptionCard extends StatelessWidget {
 
       child: Row(
         children: [
-
           CircleAvatar(
             radius: 30,
 
-            backgroundColor:
-                const Color(0xFF5B55A3),
+            backgroundColor: const Color(0xFF5B55A3),
 
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 28,
-            ),
+            child: Icon(icon, color: Colors.white, size: 28),
           ),
 
           const SizedBox(width: 20),
 
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-
                 Text(
                   title,
 
@@ -270,11 +221,7 @@ class _OptionCard extends StatelessWidget {
 
           const SizedBox(width: 10),
 
-          const Icon(
-            Icons.arrow_forward_ios_rounded,
-
-            color: Colors.white70,
-          ),
+          const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70),
         ],
       ),
     );

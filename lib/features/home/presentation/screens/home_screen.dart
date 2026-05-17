@@ -182,9 +182,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     return AlertDialog(
                                       backgroundColor: const Color(0xFF171727),
 
-                                      title: const Text(
-                                        'Edit Mess Profile',
-                                        style: TextStyle(color: Colors.white),
+                                      title: const Center(
+                                        child: Text(
+                                          'Edit Mess Profile',
+
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
                                       ),
 
                                       content: SizedBox(
@@ -466,6 +473,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 labelStyle: TextStyle(
                                                   color: Colors.grey.shade400,
                                                 ),
+
+                                                filled: true,
+
+                                                fillColor: const Color(
+                                                  0xFF1B1B2D,
+                                                ),
+
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+
+                                                      borderSide:
+                                                          BorderSide.none,
+                                                    ),
+
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+
+                                                      borderSide:
+                                                          const BorderSide(
+                                                            color: Color(
+                                                              0xFF5B55A3,
+                                                            ),
+                                                            width: 2,
+                                                          ),
+                                                    ),
                                               ),
                                             ),
 
@@ -487,6 +527,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 labelStyle: TextStyle(
                                                   color: Colors.grey.shade400,
                                                 ),
+
+                                                filled: true,
+
+                                                fillColor: const Color(
+                                                  0xFF1B1B2D,
+                                                ),
+
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+
+                                                      borderSide:
+                                                          BorderSide.none,
+                                                    ),
+
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+
+                                                      borderSide:
+                                                          const BorderSide(
+                                                            color: Color(
+                                                              0xFF5B55A3,
+                                                            ),
+                                                            width: 2,
+                                                          ),
+                                                    ),
                                               ),
                                             ),
                                           ],
@@ -509,7 +582,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             backgroundColor: const Color(
                                               0xFF5B55A3,
                                             ),
-
+                                            foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(14),
@@ -551,9 +624,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF5B55A3),
+                            foregroundColor: Colors.white,
 
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
+                              horizontal: 18,
                               vertical: 14,
                             ),
 
@@ -564,7 +638,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           icon: const Icon(Icons.edit),
 
-                          label: const Text('Edit Profile'),
+                          label: const FittedBox(
+                            fit: BoxFit.scaleDown,
+
+                            child: Text('Edit Profile', maxLines: 1),
+                          ),
                         ),
                       ],
                     ),

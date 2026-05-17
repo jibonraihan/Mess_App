@@ -5,6 +5,9 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final memberName = 'Raihan';
+    final avatarBytes = null;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B0B16),
 
@@ -19,8 +22,8 @@ class ProfileScreen extends StatelessWidget {
 
         child: Column(
           children: [
-            const Text(
-              'Welcome Raihan 👋',
+            Text(
+              'Welcome $memberName 👋',
 
               textAlign: TextAlign.center,
 
@@ -62,22 +65,28 @@ class ProfileScreen extends StatelessWidget {
 
                     backgroundColor: const Color(0xFF5B55A3),
 
-                    child: const Text(
-                      'R',
+                    backgroundImage: avatarBytes != null
+                        ? MemoryImage(avatarBytes)
+                        : null,
 
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 42,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: avatarBytes == null
+                        ? Text(
+                            memberName.substring(0, 1).toUpperCase(),
+
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 42,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : null,
                   ),
 
                   const SizedBox(height: 22),
 
                   /// NAME
-                  const Text(
-                    'Raihan',
+                  Text(
+                    memberName,
 
                     style: TextStyle(
                       color: Colors.white,
