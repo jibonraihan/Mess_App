@@ -528,72 +528,92 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
                             const SizedBox(height: 18),
 
-                            TextField(
-                              controller: bazaarListController,
-                              onSubmitted: (_) {},
-                              onTap: () {
-                                final text = bazaarListController.text;
+                            Material(
+                              color: Colors.transparent,
 
-                                if (text.isEmpty) {
-                                  bazaarListController.text = '1. ';
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
 
-                                  bazaarListController
-                                      .selection = TextSelection.collapsed(
-                                    offset: bazaarListController.text.length,
-                                  );
-                                }
-                              },
-                              keyboardType: TextInputType.multiline,
+                                    colors:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? [
+                                            const Color(0xFF0D0D18),
+                                            const Color(0xFF141426),
+                                          ]
+                                        : [
+                                            Colors.white,
+                                            const Color(0xFFF6F3FC),
+                                          ],
+                                  ),
 
-                              textInputAction: TextInputAction.newline,
+                                  borderRadius: BorderRadius.circular(14),
 
-                              maxLines: 12,
+                                  border: Border.all(
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withOpacity(0.04)
+                                        : Colors.black.withOpacity(0.04),
+                                  ),
 
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.black.withOpacity(0.22)
+                                          : Colors.black.withOpacity(0.05),
 
-                              decoration: InputDecoration(
-                                hintText: 'Start bazar listing',
-
-                                filled: true,
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-
-                                  borderSide: BorderSide.none,
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
                                 ),
 
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                child: TextField(
+                                  cursorColor: const Color(0xFF8B80F8),
 
-                                  borderSide: BorderSide.none,
-                                ),
+                                  decoration: InputDecoration(
+                                    filled: true,
 
-                                disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                    fillColor: Colors.transparent,
 
-                                  borderSide: BorderSide.none,
-                                ),
+                                    hoverColor: Colors.transparent,
 
-                                focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                    focusColor: Colors.transparent,
 
-                                  borderSide: BorderSide.none,
-                                ),
-                                fillColor:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? const Color(0xFF0F0F1B)
-                                    : const Color(0xFFF3F0FA),
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
 
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 22,
+                                      vertical: 20,
+                                    ),
+                                  ),
+                                  controller: bazaarListController,
 
-                                  borderSide: BorderSide.none,
+                                  keyboardType: TextInputType.multiline,
+                                  textInputAction: TextInputAction.newline,
+
+                                  maxLines: 10,
+
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.7,
+                                    fontWeight: FontWeight.w500,
+
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 18),
 
                             SizedBox(
