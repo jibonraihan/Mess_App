@@ -40,11 +40,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       orElse: () {},
     );
     if (mess == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF0B0B16),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
         body: Center(
-          child: Text('No mess data', style: TextStyle(color: Colors.white)),
+          child: Text(
+            'No mess data',
+
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
         ),
       );
     }
@@ -60,7 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         : 'No description yet';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0B16),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -78,17 +82,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     messName,
 
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
 
                   const SizedBox(height: 10),
 
                   Text(
-                    'Welcome back, Admin 👋',
+                    'Welcome back, Everyone 👋',
 
                     style: TextStyle(color: Colors.grey.shade400, fontSize: 18),
                   ),
@@ -102,8 +106,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: const EdgeInsets.all(28),
 
                     decoration: BoxDecoration(
-                      color: const Color(0xFF171727),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF171727)
+                          : Colors.white,
+
                       borderRadius: BorderRadius.circular(30),
+
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black.withOpacity(0.32)
+                              : Colors.black.withOpacity(0.08),
+
+                          blurRadius: 26,
+
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
                     ),
 
                     child: Column(
@@ -134,10 +153,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Text(
                           messName,
 
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
 
@@ -180,14 +199,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 return StatefulBuilder(
                                   builder: (context, setStateDialog) {
                                     return AlertDialog(
-                                      backgroundColor: const Color(0xFF171727),
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).cardColor,
 
-                                      title: const Center(
+                                      title: Center(
                                         child: Text(
                                           'Edit Mess Profile',
 
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -236,9 +259,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                               ),
 
                                                           decoration: BoxDecoration(
-                                                            color: const Color(
-                                                              0xFF171727,
-                                                            ),
+                                                            color: Theme.of(
+                                                              context,
+                                                            ).cardColor,
 
                                                             borderRadius:
                                                                 BorderRadius.circular(
@@ -463,8 +486,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             TextField(
                                               controller: nameController,
 
-                                              style: const TextStyle(
-                                                color: Colors.white,
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                               ),
 
                                               decoration: InputDecoration(
@@ -476,9 +501,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                                                 filled: true,
 
-                                                fillColor: const Color(
-                                                  0xFF1B1B2D,
-                                                ),
+                                                fillColor:
+                                                    Theme.of(
+                                                          context,
+                                                        ).brightness ==
+                                                        Brightness.dark
+                                                    ? const Color(0xFF1B1B2D)
+                                                    : const Color(0xFFF2EFF8),
 
                                                 enabledBorder:
                                                     OutlineInputBorder(
@@ -517,8 +546,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                                               maxLines: 3,
 
-                                              style: const TextStyle(
-                                                color: Colors.white,
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                               ),
 
                                               decoration: InputDecoration(
@@ -530,9 +561,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                                                 filled: true,
 
-                                                fillColor: const Color(
-                                                  0xFF1B1B2D,
-                                                ),
+                                                fillColor:
+                                                    Theme.of(
+                                                          context,
+                                                        ).brightness ==
+                                                        Brightness.dark
+                                                    ? const Color(0xFF1B1B2D)
+                                                    : const Color(0xFFF2EFF8),
 
                                                 enabledBorder:
                                                     OutlineInputBorder(
@@ -717,20 +752,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 padding: const EdgeInsets.all(24),
 
                 decoration: BoxDecoration(
-                  color: const Color(0xFF171727),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF171727)
+                      : Colors.white,
 
                   borderRadius: BorderRadius.circular(30),
+
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withOpacity(0.30)
+                          : Colors.black.withOpacity(0.07),
+
+                      blurRadius: 24,
+
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-                    const Text(
+                    Text(
                       'Bazaar Calendar',
 
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -746,9 +795,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                       calendarFormat: CalendarFormat.month,
 
-                      headerStyle: const HeaderStyle(
+                      headerStyle: HeaderStyle(
                         titleTextStyle: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -757,27 +806,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                         leftChevronIcon: Icon(
                           Icons.chevron_left,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
 
                         rightChevronIcon: Icon(
                           Icons.chevron_right,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
 
-                      daysOfWeekStyle: const DaysOfWeekStyle(
-                        weekdayStyle: TextStyle(color: Colors.white70),
-                        weekendStyle: TextStyle(color: Colors.white70),
+                      daysOfWeekStyle: DaysOfWeekStyle(
+                        weekdayStyle: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+
+                        weekendStyle: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
                       ),
 
                       calendarStyle: CalendarStyle(
                         cellMargin: const EdgeInsets.all(6),
 
                         cellPadding: const EdgeInsets.all(0),
-                        defaultTextStyle: const TextStyle(color: Colors.white),
+                        defaultTextStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
 
-                        weekendTextStyle: const TextStyle(color: Colors.white),
+                        weekendTextStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
 
                         todayDecoration: BoxDecoration(
                           color: const Color(0xFF5B55A3),
@@ -887,7 +949,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             margin: const EdgeInsets.all(3),
 
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0F0F1B),
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF0F0F1B)
+                                  : const Color(0xFFF2EFF8),
 
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -899,8 +965,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 Text(
                                   '${day.day}',
 
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -945,26 +1013,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 padding: const EdgeInsets.all(24),
 
                 decoration: BoxDecoration(
-                  color: const Color(0xFF171727),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF171727)
+                      : Colors.white,
 
                   borderRadius: BorderRadius.circular(30),
+
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withOpacity(0.30)
+                          : Colors.black.withOpacity(0.07),
+
+                      blurRadius: 24,
+
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
 
-                  children: const [
+                  children: [
                     Text(
                       'Mess Members',
 
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
 
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
                     _MemberTile(name: 'Raihan', role: 'Admin'),
 
@@ -1003,7 +1085,7 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
 
       decoration: BoxDecoration(
-        color: const Color(0xFF171727),
+        color: Theme.of(context).cardColor,
 
         borderRadius: BorderRadius.circular(24),
       ),
@@ -1019,10 +1101,10 @@ class _StatCard extends StatelessWidget {
           Text(
             value,
 
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
 
@@ -1050,8 +1132,23 @@ class _QuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF171727),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF171727)
+            : Colors.white,
+
         borderRadius: BorderRadius.circular(22),
+
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.24)
+                : Colors.black.withOpacity(0.06),
+
+            blurRadius: 16,
+
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
 
       child: Padding(
@@ -1074,8 +1171,8 @@ class _QuickActionCard extends StatelessWidget {
 
                   textAlign: TextAlign.center,
 
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1094,8 +1191,8 @@ class _QuickActionCard extends StatelessWidget {
 
                   textAlign: TextAlign.center,
 
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1123,9 +1220,23 @@ class _MemberTile extends StatelessWidget {
       padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
-        color: const Color(0xFF0F0F1B),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF0F0F1B)
+            : const Color(0xFFF4F2FA),
 
         borderRadius: BorderRadius.circular(20),
+
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.18)
+                : Colors.black.withOpacity(0.04),
+
+            blurRadius: 12,
+
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
 
       child: Row(
@@ -1151,14 +1262,17 @@ class _MemberTile extends StatelessWidget {
             child: Text(
               name,
 
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 18,
+              ),
             ),
           ),
 
           Text(
             role,
 
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
           ),
         ],
       ),
