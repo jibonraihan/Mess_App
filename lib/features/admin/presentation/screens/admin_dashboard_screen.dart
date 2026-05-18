@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../../../../core/shared/bazaar_list_store.dart';
 import '../../../mess/application/mess_controller.dart';
 
 class MessMember {
@@ -27,6 +27,7 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
+  late final TextEditingController bazaarListController;
   final ScrollController _memberScrollController = ScrollController();
   final List<MessMember> members = [
     const MessMember(
@@ -62,6 +63,23 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   void dispose() {
     _memberScrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final existingText = todaysBazaarList.value.trim();
+
+    bazaarListController = TextEditingController(
+      text: existingText.isEmpty ? '1. ' : existingText,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      bazaarListController.selection = TextSelection.collapsed(
+        offset: bazaarListController.text.length,
+      );
+    });
   }
 
   @override
@@ -467,7 +485,128 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       ),
 
                       const SizedBox(height: 32),
+                      //const SizedBox(height: 28),
+                      Container(
+                        padding: const EdgeInsets.all(24),
 
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF171727)
+                              : Colors.white,
+
+                          borderRadius: BorderRadius.circular(30),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.black.withOpacity(0.28)
+                                  : Colors.black.withOpacity(0.06),
+
+                              blurRadius: 24,
+
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          children: [
+                            Text(
+                              "Publish today's bazar list",
+
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            TextField(
+                              controller: bazaarListController,
+
+                              maxLines: 12,
+
+                              keyboardType: TextInputType.multiline,
+
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+
+                              onChanged: (value) {
+                                final lines = value.split('\n');
+
+                                bool changed = false;
+
+                                for (int i = 0; i < lines.length; i++) {
+                                  final expected = '${i + 1}. ';
+
+                                  if (!lines[i].startsWith(expected)) {
+                                    lines[i] =
+                                        '$expected${lines[i].replaceAll(RegExp(r'^\\d+\\.\\s*'), '')}';
+
+                                    changed = true;
+                                  }
+                                }
+
+                                if (changed) {
+                                  final newText = lines.join('\n');
+
+                                  bazaarListController.value = TextEditingValue(
+                                    text: newText,
+
+                                    selection: TextSelection.collapsed(
+                                      offset: newText.length,
+                                    ),
+                                  );
+                                }
+                              },
+
+                              decoration: InputDecoration(
+                                hintText: 'Start bazar listing',
+
+                                filled: true,
+
+                                fillColor:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF0F0F1B)
+                                    : const Color(0xFFF3F0FA),
+
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            SizedBox(
+                              width: double.infinity,
+
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  todaysBazaarList.value =
+                                      bazaarListController.text;
+
+                                  bazaarListUpdatedAt.value = DateTime.now();
+                                },
+
+                                child: const Text('Publish List'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
                       const Text(
                         'Expense Overview',
 

@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../mess/application/mess_controller.dart';
 import '../../../mess/domain/mess.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter/services.dart';
+import '../../../../core/shared/bazaar_list_store.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -945,17 +947,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                           final memberName = bazaarDuty[normalizedDay];
 
-                          return Container(
-                            margin: const EdgeInsets.all(3),
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+
+                            margin: const EdgeInsets.all(4),
 
                             decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? const Color(0xFF0F0F1B)
-                                  : const Color(0xFFF2EFF8),
+                              color: isSameDay(day, today)
+                                  ? const Color(0xFF6C63FF)
+                                  : Colors.transparent,
 
                               borderRadius: BorderRadius.circular(16),
+
+                              boxShadow: isSameDay(day, today)
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFF6C63FF,
+                                        ).withOpacity(0.35),
+
+                                        blurRadius: 12,
+
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ]
+                                  : null,
                             ),
 
                             child: Column(
@@ -969,7 +985,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 17,
                                   ),
                                 ),
 
@@ -985,7 +1002,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                                       style: TextStyle(
                                         color: isSameDay(day, today)
-                                            ? const Color(0xFFFFD66B)
+                                            ? Colors.white
                                             : const Color(0xFF8B80F8),
 
                                         fontSize: isSameDay(day, today)
@@ -1006,6 +1023,167 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 30),
+              ValueListenableBuilder(
+                valueListenable: todaysBazaarList,
+
+                builder: (context, value, _) {
+                  return Container(
+                    width: double.infinity,
+
+                    padding: const EdgeInsets.all(24),
+
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF171727)
+                          : Colors.white,
+
+                      borderRadius: BorderRadius.circular(30),
+
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black.withOpacity(0.28)
+                              : Colors.black.withOpacity(0.06),
+
+                          blurRadius: 24,
+
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                                children: [
+                                  Text(
+                                    "Today's bazar list",
+
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 4),
+
+                                  ValueListenableBuilder(
+                                    valueListenable: bazaarListUpdatedAt,
+
+                                    builder: (context, updatedAt, _) {
+                                      if (updatedAt == null) {
+                                        return const SizedBox();
+                                      }
+
+                                      final months = [
+                                        'Jan',
+                                        'Feb',
+                                        'Mar',
+                                        'Apr',
+                                        'May',
+                                        'Jun',
+                                        'Jul',
+                                        'Aug',
+                                        'Sep',
+                                        'Oct',
+                                        'Nov',
+                                        'Dec',
+                                      ];
+
+                                      final hour = updatedAt.hour > 12
+                                          ? updatedAt.hour - 12
+                                          : updatedAt.hour;
+
+                                      final minute = updatedAt.minute
+                                          .toString()
+                                          .padLeft(2, '0');
+
+                                      final ampm = updatedAt.hour >= 12
+                                          ? 'pm'
+                                          : 'am';
+
+                                      final formatted =
+                                          '${updatedAt.day} '
+                                          '${months[updatedAt.month - 1]}, '
+                                          '$hour:$minute $ampm';
+
+                                      return Text(
+                                        'Updated: $formatted',
+
+                                        style: TextStyle(
+                                          fontSize: 12,
+
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white54
+                                              : Colors.black54,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            IconButton(
+                              onPressed: () async {
+                                await Clipboard.setData(
+                                  ClipboardData(text: value),
+                                );
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Copied to clipboard'),
+                                  ),
+                                );
+                              },
+
+                              icon: Icon(
+                                Icons.copy_rounded,
+
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        Text(
+                          value.trim().isEmpty
+                              ? 'No bazar list published'
+                              : value,
+
+                          style: TextStyle(
+                            height: 1.7,
+
+                            fontSize: 16,
+
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 28),
               // MEMBERS
               Container(
                 width: double.infinity,
