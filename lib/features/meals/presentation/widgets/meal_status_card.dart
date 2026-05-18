@@ -9,9 +9,28 @@ class MealStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF171727)
+            : const Color(0xFFF1EEF7),
+
+        borderRadius: BorderRadius.circular(22),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.18),
+
+            blurRadius: 18,
+
+            offset: const Offset(0, 8),
+          ),
+        ],
+
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
