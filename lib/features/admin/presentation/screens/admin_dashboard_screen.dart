@@ -530,49 +530,56 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
                             TextField(
                               controller: bazaarListController,
+                              onSubmitted: (_) {},
+                              onTap: () {
+                                final text = bazaarListController.text;
+
+                                if (text.isEmpty) {
+                                  bazaarListController.text = '1. ';
+
+                                  bazaarListController
+                                      .selection = TextSelection.collapsed(
+                                    offset: bazaarListController.text.length,
+                                  );
+                                }
+                              },
+                              keyboardType: TextInputType.multiline,
+
+                              textInputAction: TextInputAction.newline,
 
                               maxLines: 12,
-
-                              keyboardType: TextInputType.multiline,
 
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
 
-                              onChanged: (value) {
-                                final lines = value.split('\n');
-
-                                bool changed = false;
-
-                                for (int i = 0; i < lines.length; i++) {
-                                  final expected = '${i + 1}. ';
-
-                                  if (!lines[i].startsWith(expected)) {
-                                    lines[i] =
-                                        '$expected${lines[i].replaceAll(RegExp(r'^\\d+\\.\\s*'), '')}';
-
-                                    changed = true;
-                                  }
-                                }
-
-                                if (changed) {
-                                  final newText = lines.join('\n');
-
-                                  bazaarListController.value = TextEditingValue(
-                                    text: newText,
-
-                                    selection: TextSelection.collapsed(
-                                      offset: newText.length,
-                                    ),
-                                  );
-                                }
-                              },
-
                               decoration: InputDecoration(
                                 hintText: 'Start bazar listing',
 
                                 filled: true,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
 
+                                  borderSide: BorderSide.none,
+                                ),
+
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+
+                                  borderSide: BorderSide.none,
+                                ),
+
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+
+                                  borderSide: BorderSide.none,
+                                ),
+
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+
+                                  borderSide: BorderSide.none,
+                                ),
                                 fillColor:
                                     Theme.of(context).brightness ==
                                         Brightness.dark
@@ -594,10 +601,37 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
                               child: ElevatedButton(
                                 onPressed: () {
-                                  todaysBazaarList.value =
-                                      bazaarListController.text;
+                                  final lines = bazaarListController.text.split(
+                                    '\n',
+                                  );
+
+                                  final cleaned = lines
+                                      .map(
+                                        (e) => e.replaceAll(
+                                          RegExp(r'^\d+\.\s*'),
+                                          '',
+                                        ),
+                                      )
+                                      .where((e) => e.trim().isNotEmpty)
+                                      .toList();
+
+                                  final formatted = List.generate(
+                                    cleaned.length,
+                                    (index) =>
+                                        '${index + 1}. ${cleaned[index]}',
+                                  ).join('\n');
+
+                                  todaysBazaarList.value = formatted;
 
                                   bazaarListUpdatedAt.value = DateTime.now();
+
+                                  bazaarListController.text =
+                                      '$formatted\n${cleaned.length + 1}. ';
+
+                                  bazaarListController
+                                      .selection = TextSelection.collapsed(
+                                    offset: bazaarListController.text.length,
+                                  );
                                 },
 
                                 child: const Text('Publish List'),
